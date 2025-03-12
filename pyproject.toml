@@ -23,6 +23,7 @@ dependencies=[
         'numpy',
         'networkx',
         'unidecode',
+        'h5py',
 ]
 
 [project.urls]
