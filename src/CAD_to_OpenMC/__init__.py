@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 E. B. Knudsen <erik@united-neux.eu>
+# SPDX-License-Identifier: MIT
+
 from contextlib import contextmanager
 import os
 from shutil import copy
