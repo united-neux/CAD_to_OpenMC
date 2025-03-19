@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 E. B. Knudsen <erik@united-neux.eu>
+#
+# SPDX-License-Identifier: MIT
+
 import cadquery as cq
 import subprocess as sp
 import pathlib as pl

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 E. B. Knudsen <erik@united-neux.eu>
+#
+# SPDX-License-Identifier: MIT
+
 """
 a set of utility functions that deal with stl-files
 """

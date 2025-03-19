@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 E. B. Knudsen <erik@united-neux.eu>
+#
+# SPDX-License-Identifier: MIT
+
 """
   Set of utility functions that handle IO with the .mesh format
 """

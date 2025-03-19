@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 E. B. Knudsen <erik@united-neux.eu>
+#
+# SPDX-License-Identifier: MIT
+
 import CAD_to_OpenMC.assembly as ab
 import subprocess as sp
 import h5py
