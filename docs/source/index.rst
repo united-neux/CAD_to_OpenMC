@@ -4,8 +4,8 @@ Welcome to The documentation for CAD_to_OpenMC
 creating OpenMC-ready surface meshes from a CAD-generated representation
 of the geometry in the form of a .step (or .stp)-file.
 
-Check out the :doc:`source/usage` section for further information, including
-:doc:`source/install`.
+Check out the :doc:`usage` section for further information, including
+:doc:`install`.
 
 .. note::
 
