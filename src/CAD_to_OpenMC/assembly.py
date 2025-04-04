@@ -1259,13 +1259,13 @@ def merge2h5m(assemblies =[], h5m_file: str ="dagmc.h5m", vtk: bool = True, verb
     paramters
     ---------
     assemblies: list
-        Iterable of Assemblies
+        Iterable of Assemblies.
     h5m_file: string
-        Filename of merged file
+        Filename of merged file.
     vtk: bool
-        If True, also write a vtk-file of the structure
+        If True, also write a vtk-file of the structure.
     verbose: int
-        If == 0 do not write status messages
+        If == 0 do not write status messages to console.
     """
 
     #create a dummy object - this will not actually be used for anything.
