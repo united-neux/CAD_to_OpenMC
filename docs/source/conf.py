@@ -10,6 +10,7 @@ master_doc = 'index'
 
 extensions = [
     "sphinx.ext.duration",
+    "sphinx.ext.napoloeon",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
