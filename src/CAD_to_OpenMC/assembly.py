@@ -185,7 +185,7 @@ def idx_similar(entity_list, center, bounding_box, volume):
     """
     Which objects (if any) are similar to the object specified by the set of parameters
 
-    parameters
+    Parameters
     ----------
     entity_list : List
         List of entities to check agains the given parameters
@@ -193,10 +193,10 @@ def idx_similar(entity_list, center, bounding_box, volume):
         The center coordinate to compare with
     bb :
         Bounding box to compare with
-     volume :
+    volume :
         Volume to compare with
 
-    returns
+    Returns
     -------
     int
         The index in the entity_list for which a solid is similar in terms of bounding box, cms, and volume
@@ -261,12 +261,18 @@ class Assembly:
     N.b. if geometries are not overlapping it may be simple to use a single Assembly-object per
     step-file and merge them later using the merge_h5m-methiod.
 
-    parameters
+    Parameters
     ----------
     stp_files : 
         List of filenames of the step-files to be processed. Most often this is a lits with single member
+    verbose : int
+        verbosity level of output. 0: most quiet, 1: some output, 2+: a lot of diagnostic output
+    default_tag : str
+        Material tag to apply to objects where none is found or where no tag-conversion is applicable
+    implicit_complement : str or None
+        Material tag to be applied to the volume _not_ claimed by any object. If set to None, it is ignored.
 
-    attributes
+    Attributes
     ----------
     stp_files : List
         List of filenames of the step-files to be processed.
