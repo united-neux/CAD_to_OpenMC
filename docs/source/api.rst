@@ -4,5 +4,9 @@ API
 .. autosummary::
    :toctree: generated
 
-   CAD_to_OpenMC
-   CAD_to_OpenMC.assembly
+.. autoclass::
+   CAD_to_OpenMC.assembly.Assembly
+
+.. autoclass::
+   CAD_to_OpenMC.assembly.Entity
+
