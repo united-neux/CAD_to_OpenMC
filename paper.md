@@ -77,7 +77,7 @@ The CAD_to_OpenMC tool eases the process of generating a meshed description
 of a CAD-generated geometry (in the form of a step-file) ready for inclusion in
 transport codes through DAGMC.
 
-While other active projects exist that target similar problems (e.g. cad_to_dagmc[@cadtodagmc], and stellarmesh[@stellarmesh]),
+While other active projects exist that target similar problems (e.g. cad_to_dagmc [@cadtodagmc], and stellarmesh [@stellarmesh]),
 CAD_to_OpenMC is designed with generality in mind. This is defined as:
 First, it is aimed at
 working for all step-geometries, with no assumptions on geometry. Second, it must be relatively easy
@@ -192,7 +192,7 @@ We have chosen 3 reactor models as test systems. A table-top reactor and two ful
 
 ## GODIVA IV
 This model was chosen since it exhibits moderate complexity and has a generous set of experimental data to benchmark against.
-It is detailed enough to be cumbersome to model quickly using CSG but for with
+It is detailed enough to be cumbersome to model quickly using CSG but not with
 CAD. Further, CSG models (for MCNP) may be found in the published benchmark,
 along with detailed experimental validation data allowing for practical
 comparison.
@@ -315,7 +315,7 @@ literature,$k_{eff,lit}$ [@cottrell_are_operation_1955; @robertson_msre_1965].
 
 
 # Discussion and Conclusion
-We submit that have shown that the tool presented in this paper is a convenient tool for making CAD geometries available for Monte Carlo particle transport. By utilizing the DAGMC-layer the resulting geometries are not restricted to OpenMC, but in fact may be used also in MCNP, fluka, etc. Experience has shown that a particularly useful feature is to extract tags from CAD-defined parts and interpret them as material tags for transport. This enables a consistent material naming scheme throughout the entire modeling procedure.
+We submit that we have shown that the tool presented in this paper is a convenient tool for making CAD geometries available for Monte Carlo particle transport. By utilizing the DAGMC-layer the resulting geometries are not restricted to OpenMC, but in fact may be used also in MCNP, fluka, etc. Experience has shown that a particularly useful feature is to extract tags from CAD-defined parts and interpret them as material tags for transport. This enables a consistent material naming scheme throughout the entire modeling procedure.
 
 Finally, as noted, other active projects exist targeting the problem. In the interest of efficiency and resource management, there are active efforts aimed unification, which may bear fruit in coming releases.
 
