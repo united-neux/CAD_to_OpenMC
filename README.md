@@ -71,12 +71,12 @@ _replace \<name\> with an arbitrary name for your virtual environment_
 If instead you prefer to use a [conda-environment](https://docs.conda.io/projects/conda/en/stable/), this is now as simple as:
 1. create an environment, e.g. ```conda create -n <name>```
 2. activate it: ```conda activate <name>```
-3. install CAD_to_OpenMC: ```conda install cad-to-openmc```
+3. install CAD_to_OpenMC: ```conda install -c conda-forge cad-to-openmc```
 
-You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so.
+You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so. In many cases conda and mamba are already configured by default to use the conda-forge channel. If that is the case you may omit "-c conda-forge".
 
 ## Verifying your installation
-Should you wish to do so - you may verifgy your installation of CAD_to_OpenMC by running the script `self_cotained_test.py`-script located in the tests directory. This writes a step-file, converts it to triangles, and checks that the created triangles have vertices as expected.
+Should you wish to do so - you may verify your installation of CAD_to_OpenMC by running the script `self_contained_test.py`-script located in the tests directory. This writes a step-file, converts it to triangles, and checks that the created triangles have vertices as expected.
 
 # Known problems
 - At present the parallel meshing option is buggy - it is therefore highly recommended to set the mesher to only use 1 thread. The team is working on a solution for this. See issue [#80](https://github.com/openmsr/CAD_to_OpenMC/issues/80)

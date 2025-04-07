@@ -1,6 +1,6 @@
 # Installation
 Generally we support two main ways of installing CAD_to_OpenMC: through pip and through conda/mamba.
-In the former case there is an additional dependency problem in terms of MOAB (short for Mesh Oriented datABase) 
+In the former case there is an additional dependency problem in terms of MOAB (short for Mesh Oriented datABase)
 which is not yet available in the PYPI package index.
 
 ## In a virtual python environment using pip
@@ -27,7 +27,7 @@ _replace \<name\> with an arbitrary name for your virtual environment_
         ```python
         pip install https://github.com/shimwell/wheels/raw/refs/heads/main/moab/moab-wheels-ubuntu-latest/moab-5.5.1-cp{pyv}-cp{pyv}-manylinux_2_28_x86_64.whl
         ```
-        where {pyv} refers to an abbreviated python version: "312" for python 3.12, etc. 
+        where {pyv} refers to an abbreviated python version: "312" for python 3.12, etc.
 4. Install the main package: ```pip install CAD_to_OpenMC```. This will pip-install all the required python packages in the virtual environment. This ensures that no additional conflicts are introduced with the system python.
 
 Should you wish to install the development version of this package you may do so by cloning this repository and replace the last command by: ```pip install <path/to/repo>```. This procedure will build and install the python package locally directly from source.
@@ -40,6 +40,6 @@ _replace \<name\> with an arbitrary name for your virtual environment_
 If instead you prefer to use a [conda-environment](https://docs.conda.io/projects/conda/en/stable/), this is now as simple as:
 1. create an environment, e.g. ```conda create -n <name>```
 2. activate it: ```conda activate <name>```
-3. install CAD_to_OpenMC: ```conda install cad-to-openmc```
+3. install CAD_to_OpenMC: ```conda install -c conda-forge cad-to-openmc```
 
-You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so.
+You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so. In many cases conda and mamba are already configured by default to use the conda-forge channel. If that is the case you may omit "-c conda-forge"
