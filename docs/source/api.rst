@@ -1,12 +1,7 @@
 API
 ===
 
-.. autosummary::
-   :toctree: generated
+.. toctree::
+   :maxdepth: 4
 
-.. autoclass::
-   CAD_to_OpenMC.assembly.Assembly
-
-.. autoclass::
-   CAD_to_OpenMC.assembly.Entity
-
+   CAD_to_OpenMC

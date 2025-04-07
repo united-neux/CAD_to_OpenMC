@@ -19,4 +19,3 @@ Contents
    install.md
    usage.md
    api.rst
-
