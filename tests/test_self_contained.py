@@ -1,5 +1,6 @@
 import CAD_to_OpenMC.assembly as ab
 import subprocess as sp
+import sys
 import h5py
 import numpy as np
 import pathlib as pl
@@ -11,7 +12,7 @@ FILE_DESCRIPTION(('FreeCAD Model'),'2;1');
 FILE_NAME('Open CASCADE Shape Model','2025-03-04T11:39:47',('Author'),(
     ''),'Open CASCADE STEP processor 7.7','FreeCAD','Unknown');
 FILE_SCHEMA((
-'AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF. {1 0 10303 442 1 1 4 
+'AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF. {1 0 10303 442 1 1 4
 }'));
 ENDSEC;
 DATA;
@@ -180,7 +181,7 @@ DATA;
 #162 = CARTESIAN_POINT('',(0.,0.,16.));
 #163 = DIRECTION('',(0.,0.,1.));
 #164 = DIRECTION('',(1.,0.,-0.));
-#165 = ( GEOMETRIC_REPRESENTATION_CONTEXT(3) 
+#165 = ( GEOMETRIC_REPRESENTATION_CONTEXT(3)
 GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#169)) GLOBAL_UNIT_ASSIGNED_CONTEXT
 ((#166,#167,#168)) REPRESENTATION_CONTEXT('Context #1',
   '3D Context with UNIT and UNCERTAINTY') );
@@ -245,6 +246,8 @@ def test_roundtrip():
     os.unlink('cuboid001_tmp.step')
     os.unlink('cuboid001_tmp.h5m')
     os.unlink('cuboid001_tmp.vtk')
+
+    print(f"Info: {sys.argv[0]} roundtrip test successful. CAD_to_OpenMC seems to be working as intended.")
 
 if __name__=='__main__':
     test_roundtrip()
