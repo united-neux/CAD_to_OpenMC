@@ -243,7 +243,7 @@ The ```run.sh```-script will the ask you what kind of calculation you'd like to 
 5) neutron flux 3d
 6) photon flux
 7) quit
-ZPRE simulations: 
+ZPRE simulations:
 ```
 
 As a first run you might choose to ask OpenMC to simply plot the geometry of the reactor (option 2). If this is the first time you run the script, this triggers a surface-meshing operation to be performed (Be aware that by default this creates a large amount of console output - this is to be expected).
@@ -259,7 +259,7 @@ import CAD_to_OpenMC.assembly as ab
 
 #inputs
 step_files=[pl.Path('step_files') / pl.Path(s) for s in ['zpre_core.step','zpre_control_rod.step','zpre_source.step']]
-h5m_files=[pl.Path('h5m_files') / pl.Path(h.parts).with_suffix('.h5m') for h in step_files] 
+h5m_files=[pl.Path('h5m_files') / pl.Path(h.parts).with_suffix('.h5m') for h in step_files]
 
 #mesher config
 ab.mesher_config['threads'] = 1
@@ -347,4 +347,3 @@ plots.export_to_xml()
 
 openmc.plot_geometry()
 ```
-
