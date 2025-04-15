@@ -156,22 +156,195 @@ ab.merge2h5m([One,Two],h5m_file='three.h5')
 ```
 This will run the normal triangulization procedure for one and two separately, but also create a single h5m-file: three.h5m which contains both of the geometries.
 
-# Advanced example
-For a more advanced example of the use of CAD_to_OpenMC and OpenMC we may turn to the Zero Power Reactor Experiment. This was a full-scale reactor experiment that was carried out at Oak Rodge TN in the 1960's. Copenhagen Atomics provides a CAD-drawn model of this experiment, extracted from the original reports and drawings from the original experiment, in the form of a step-file. To get access simply clone the zpre github repository and run the scripts:
+# Advanced examples
+In this section we will describe two advanced examples of real-world reactors where CAD_to_OpenMC has been used in conjunction with OpenMC (and other software) to generate results that may be compared to experimental data.
+The first example is a table-top fast reactor named [GODIVA IV](https://www.tandfonline.com/doi/full/10.1080/00295639.2021.1947103), the second a model of a molten salt reactor zero-power experiment [ZPRE](https://www.osti.gov/biblio/4673343).
+Note that these examples and scripts originate from different authors and therefore differ in style.
+
+## GODIVA IV
+This table-top reactor is a solid-state uranium-fueled fast reactor which is
+operated with the help of fuel rods that may inserted from the bottom of the
+reactor, the create "bursts" of reactivitiy. Historically its origins are a set
+of GODIVA-devices so named because they are "naked". The first such devices
+were assemblies of half-spherical shells of  enriched uranium. When brought
+together they'd form a complete sphere close to criticality. At least in one
+version the geometry included a central bore through which a uranium rod was
+dropped, thus creating a short-burst of criticality.
+
+The IV-version of this
+device, which we will descrobe here, is a more controlled version with a radially symmetric geometry, and is
+included in the NEA-sponsored benchmark collection: [ICBSEP](https://www.oecd-nea.org/jcms/pl_24498/international-criticality-safety-benchmark-evaluation-project-icsbep).
+
+All scripts and necessary data may be retrieved from here: [ZENODO GODIVA VI v1](https://doi.org/10.5281/zenodo.15194864).
+
+### Geometry conversion
+The script associated with geometry conversion is very simple and listed in its entirety below:
+```python
+# SPDX-FileCopyrightText: (C) 2025 Erik B Knudsen
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+import CAD_to_OpenMC.assembly as ab
+
+A=ab.Assembly(['step_files/GIV_BR_detailed.step'])
+B=ab.Assembly(['step_files/GIV_CR_detailed.step'])
+C=ab.Assembly(['step_files/GIV_core_detailed.step'])
+
+#fix the delimiter to keep underscores in material names
+for X in (A,B,C):
+	X.set_tag_delim('\s@')
+
+#run the mesher using the 'db'-backend
+A.run(backend='db', h5m_filename='GIV_BR_det.h5m')
+B.run(backend='db', h5m_filename='GIV_CR_det.h5m')
+C.run(backend='db', h5m_filename='GIV_core_det.h5m')
+```
+As noted, this script uses the 'db'-backend for surface mesh creation. Which in turn s based on the s.k. Dellabella-alogrithm.
+
+### OpenMC-runs.
+The suage example contains an object oriented approach where a reactor-object is built, which contains geometry, tallies, execution settings, etc. for OpenMC. To simply run the example with default settings, it is enough to:
+```bash
+python run_openmc.py
+```
+which will simply assemble the geometry, and do a default run. If however, you should wish to shift the control rods and/or burst rods of the reactor, this may be done by modifying line 8 of the script, i.e.:
+```python
+reactor = GIV_reactor('GIV_core_det.h5m', 'GIV_BR_det.h5m', 'GIV_CR_det.h5m', burst_rod_z=5.0, ctrl_rod_z=[2,2], operating_temp=800)
+```
+
+The benchmark defines 5 experimental cases, corresponding to 5 rod positions. These have been added to the model script add may be accessed by changing the instantiation-line to, e.g. for experimental case 4 (burst rod fully out, both control rods fully in):
+```python
+reactor = GIV_reactor('GIV_core_det.h5m', 'GIV_BR_det.h5m', 'GIV_CR_det.h5m', case=4, operating_temp=800)
+```
+
+The script additionally defines a set of general pupose tallies that mesure neutron flux as a function of spatial position or energy. Should you wish to define additional tallies please consult the [OpenMC documentation](https://docs.openmc.org).
+
+## ZPRE
+For am even more advanced example of the use of CAD_to_OpenMC and OpenMC we may
+turn to the Zero Power Reactor Experiment. This was a full-scale reactor
+experiment that was carried out at Oak Rodge TN in the 1960's. Copenhagen
+Atomics provides a CAD-drawn model of this experiment, extracted from the
+original reports and drawings from the original experiment, in the form of a
+step-file. To get access simply clone the zpre github repository and run the
+scripts:
 ```bash
 git clone https://www.github.com/openmsr/zpre
 cd zpre
 bash run.sh
 ```
-The ```run.sh```-script will the ask you what kind of calculation you'd like to perform. As a first run you might choose to ask OpenMC to simply plot the geometry of the reactor (option 2). If this is the first time you run the script, this triggers a surface-meshing operation to be performed (Be aware that by default this creates a large amount of console output - this is to be expected).
-During the surface meshing operation (by default) a .vtk-file is created in addition to the .h5m-file that OpenMC (and DAGMC) needs. This is for convenience so you may inspect the created mesh using e.g. paraview, if you have access to that.
-If you have paraview installed the call ```paraview h5m_files/zpre.vtk``` should yield a geometry like this ![zpre.vtk](../images/zpre_paraview.png).
+The ```run.sh```-script will the ask you what kind of calculation you'd like to perform.
+```bash
++ PS3='ZPRE simulations: '
++ options=("k eigenvalue" "geometry plot" "geometry voxelplot" "neutron flux" "neutron flux 3d" "photon flux" "quit")
++ select opt in "${options[@]}"
+1) k eigenvalue
+2) geometry plot
+3) geometry voxelplot
+4) neutron flux
+5) neutron flux 3d
+6) photon flux
+7) quit
+ZPRE simulations: 
+```
 
-Once this process has finished, there should now be a file zpre.h5m inside the h5m_files directory, and a set of plot_[123].png files. which correspond to XY,XZ, and YZ-slices through the center of the reactor.
+As a first run you might choose to ask OpenMC to simply plot the geometry of the reactor (option 2). If this is the first time you run the script, this triggers a surface-meshing operation to be performed (Be aware that by default this creates a large amount of console output - this is to be expected).
+During the surface meshing operation (by default) a .vtk-file is created in addition to the .h5m-file that OpenMC (and DAGMC) needs. This is for convenience so you may inspect the created mesh using e.g. paraview, if you have access to that.
+If you have paraview installed the call ```paraview h5m_files/zpre.vtk``` should yield a geometry like this ![zpre.vtk](images/zpre_paraview.png).
+The script that created the surface mesh is reproduced below.
+
+```python
+import numpy as np
+import os
+import pathlib as pl
+import CAD_to_OpenMC.assembly as ab
+
+#inputs
+step_files=[pl.Path('step_files') / pl.Path(s) for s in ['zpre_core.step','zpre_control_rod.step','zpre_source.step']]
+h5m_files=[pl.Path('h5m_files') / pl.Path(h.parts).with_suffix('.h5m') for h in step_files] 
+
+#mesher config
+ab.mesher_config['threads'] = 1
+ab.mesher_config['tolerance'] = 0.01
+
+#output
+for s,h in zip(step_files,h5m_files):
+  a.ab.Assembly([s])
+  a.verbose=2
+  a.run(backend='stl2',merge=True,h5m_filename=h)
+
+```
+Here the 3 step-files consist of 3 distinct parts of the ZPRE-reactor, namely the core geometry, the single control-rod, and the neutron source. The source is a natural deacy driven neutron emitter, that acts as a kickstart to the fission process. The idea behind leaving these geometry separate is of course that they may the be meshed once, but independently moved in relation to each other afterwards.
+
+If as indicated above option 2 (geometry plot was chosen and the process finished without errors, there should now be a file zpre.h5m inside the h5m_files directory, and a set of plot_[123].png files. which correspond to XY,XZ, and YZ-slices through the center of the reactor.
 If all goes well these should look something like this:
 
 |XY|XZ|XZ|
 |:--:|:--:|:--:|
-| ![plot_xy.png](../images/plot_xy.png) | ![plot_xz.png](../images/plot_xz.png) | ![plot_yz.png](../images/plot_yz.png) |
+| ![plot_xy.png](images/plot_xy.png) | ![plot_xz.png](images/plot_xz.png) | ![plot_yz.png](images/plot_yz.png) |
 
 The colors are chosen arbitrarily amd automatically by the OpenMC-plotting routine, which is why the same geomtrical entity gets a different color in the slices.
+```python
+import matplotlib
+import openmc
+from materials import *
+
+###############################################################################
+#generate geometry plot of zpre (boron sleeves fully inserted)
+###############################################################################
+
+# geometry
+h5m_filepath = 'h5m_files/zpre.h5m'
+graveyard = openmc.Sphere(r=10000,boundary_type='vacuum')
+cad_univ = openmc.DAGMCUniverse(filename=h5m_filepath,auto_geom_ids=True)
+cad_cell = openmc.Cell(region=-graveyard,fill=cad_univ)
+root=openmc.Universe()
+root.add_cells([cad_cell])
+geometry=openmc.Geometry(root)
+geometry.export_to_xml()
+
+# materials
+mats = openmc.Materials([inconel,reflector,b4c,hastelloyx,stainless,brass,
+                         helium,scintillator,insulation,bepo,lindsay,gold,
+                         aluminum,dt,fuel,boron])
+mats.export_to_xml()
+
+#plotting geometry
+plots = openmc.Plots()
+
+x_width = 250
+y_width = 250
+res = 1000
+
+#xy plot
+p1 = openmc.Plot()
+#p1.origin=[0,0,100]
+p1.basis = 'xy'
+p1.width = (x_width,y_width)
+p1.pixels = (res,res)
+p1.filename='plot_xy'
+p1.color_by = 'material'
+
+#xz plot
+p2 = openmc.Plot()
+#p2.origin=[0,0,100]
+p2.basis = 'xz'
+p2.width = (x_width,y_width)
+p2.pixels = (res,res)
+p2.filename='plot_xz'
+p2.color_by = 'material'
+
+p3 = openmc.Plot()
+#p3.origin=[0,0,100]
+p3.basis = 'yz'
+p3.width = (x_width,y_width)
+p3.pixels = (res,res)
+p3.filename='plot_yz'
+p3.color_by = 'material'
+
+plots.append(p1)
+plots.append(p2)
+plots.append(p3)
+plots.export_to_xml()
+
+openmc.plot_geometry()
+```
+
