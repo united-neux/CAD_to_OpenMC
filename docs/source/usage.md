@@ -229,7 +229,7 @@ step-file. To get access simply clone the zpre github repository
 ```bash
 git clone --branch v0.1.2 https://www.github.com/united-neux/zpre
 ```
-or get the release from here: [ZENODO ZPRE v0.1.2](https://doi.org/10.5281/zenodo.15268005).
+or get the release from here: [ZENODO ZPRE](https://doi.org/10.5281/zenodo.15267937).
 
 Enter the directory and run the convenience-script ```run.sh```.
 The script will ask you what kind of calculation you'd like to perform.
