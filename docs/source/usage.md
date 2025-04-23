@@ -246,7 +246,7 @@ The script will ask you what kind of calculation you'd like to perform.
 7) quit
 ZPRE simulations:
 ```
-If there's no surfaces meshed model to be found in the subdirectory ```h5m_files```, CAD_to_OpenMC will be run at this point. Please be aware that the settings used for this reactor requires around 20GB memory. If this is not available to you, you may e.g. edit the script to use that ```stl2```-backend instead, which is less hungry.
+If there's no surfaces meshed model to be found in the subdirectory ```h5m_files```, CAD_to_OpenMC will be run at this point. Please be aware that the settings used for this reactor requires around 20GB memory. If this is not available to you, you may e.g. edit the script to use the ```stl2```-backend instead, which is less hungry.
 
 
 As a first run you might choose to ask OpenMC to simply plot the geometry of the reactor (option 2). If this is the first time you run the script, this triggers a surface-meshing operation to be performed (Be aware that by default this creates a large amount of console output - this is to be expected).
