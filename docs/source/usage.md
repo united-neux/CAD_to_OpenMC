@@ -224,14 +224,15 @@ turn to the Zero Power Reactor Experiment. This was a full-scale reactor
 experiment that was carried out at Oak Rodge TN in the 1960's. Copenhagen
 Atomics provides a CAD-drawn model of this experiment, extracted from the
 original reports and drawings from the original experiment, in the form of a
-step-file. To get access simply clone the zpre github repository and run the
-scripts:
+step-file. To get access simply clone the zpre github repository
+
 ```bash
-git clone https://www.github.com/openmsr/zpre
-cd zpre
-bash run.sh
+git clone --branch v0.1.2 https://www.github.com/united-neux/zpre
 ```
-The ```run.sh```-script will the ask you what kind of calculation you'd like to perform.
+or get the release from (https://doi.org/10.5281/zenodo.15268005).
+
+Enter the directory and run the convenience-script ```run.sh```.
+The script will ask you what kind of calculation you'd like to perform.
 ```bash
 + PS3='ZPRE simulations: '
 + options=("k eigenvalue" "geometry plot" "geometry voxelplot" "neutron flux" "neutron flux 3d" "photon flux" "quit")
@@ -252,25 +253,37 @@ If you have paraview installed the call ```paraview h5m_files/zpre.vtk``` should
 The script that created the surface mesh is reproduced below.
 
 ```python
-import numpy as np
+###############################################################################
+# Converting step files to h5m file to be read by openmc
+###############################################################################
 import os
-import pathlib as pl
 import CAD_to_OpenMC.assembly as ab
+###############################################################################
 
-#inputs
-step_files=[pl.Path('step_files') / pl.Path(s) for s in ['zpre_core.step','zpre_control_rod.step','zpre_source.step']]
-h5m_files=[pl.Path('h5m_files') / pl.Path(h.parts).with_suffix('.h5m') for h in step_files]
+# inputs
+step_filepath = "./step_files/zpre.step"
+compressed_path = step_filepath + ".gz"
+h5m_out_filepath = os.getcwd() + '/h5m_files/zpre.h5m'
 
-#mesher config
+#uncompress if necessary
+if not os.path.exists(step_filepath):
+    os.system("gunzip -k " + compressed_path)
+
+# mesher config
+ab.mesher_config['mesh_algorithm'] = 2
 ab.mesher_config['threads'] = 1
-ab.mesher_config['tolerance'] = 0.01
+ab.mesher_config['curve_samples'] = 50
+ab.mesher_config['angular_tolerance'] = 0.20
+ab.mesher_config['tolerance'] = 0.3
+exit()
 
-#output
-for s,h in zip(step_files,h5m_files):
-  a.ab.Assembly([s])
-  a.verbose=2
-  a.run(backend='stl2',merge=True,h5m_filename=h)
-
+# output
+a=ab.Assembly()
+a.verbose=2
+a.stp_files=[step_filepath]
+a.import_stp_files()
+a.merge_all()
+a.solids_to_h5m(backend='gmsh',h5m_filename=h5m_out_filepath)
 ```
 Here the 3 step-files consist of 3 distinct parts of the ZPRE-reactor, namely the core geometry, the single control-rod, and the neutron source. The source is a natural deacy driven neutron emitter, that acts as a kickstart to the fission process. The idea behind leaving these geometry separate is of course that they may the be meshed once, but independently moved in relation to each other afterwards.
 
