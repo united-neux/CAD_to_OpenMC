@@ -285,9 +285,12 @@ a.import_stp_files()
 a.merge_all()
 a.solids_to_h5m(backend='gmsh',h5m_filename=h5m_out_filepath)
 ```
-Here the 3 step-files consist of 3 distinct parts of the ZPRE-reactor, namely the core geometry, the single control-rod, and the neutron source. The source is a natural deacy driven neutron emitter, that acts as a kickstart to the fission process. The idea behind leaving these geometry separate is of course that they may the be meshed once, but independently moved in relation to each other afterwards.
+Here the the single step-file contains 3 distinct parts of the ZPRE-reactor, namely the core geometry, the single control-rod, and the neutron source. The source is a natural deacy driven neutron emitter, that acts as a kickstart to the fission process. Since all 3 are bundled into the same step-file and hence also the same h5m-file, positions are static.
 
-If as indicated above option 2 (geometry plot was chosen and the process finished without errors, there should now be a file zpre.h5m inside the h5m_files directory, and a set of plot_[123].png files. which correspond to XY,XZ, and YZ-slices through the center of the reactor.
+If as indicated above option 2 (geometry plot) was chosen and the process
+finished without errors, there should now be a file zpre.h5m inside the
+h5m_files directory, and a set of plot_[123].png files. which correspond to
+XY,XZ, and YZ-slices through the center of the reactor.
 If all goes well these should look something like this:
 
 |XY|XZ|XZ|
