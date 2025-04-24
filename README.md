@@ -1,9 +1,11 @@
 |Main | Development|
-|---|---|
+|---|---|---]
 |[![Main branch](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml)| [![Development branch](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml/badge.svg?branch=develop)](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml)|
 
 ![GitHub License](https://img.shields.io/github/license/openmsr/CAD_to_OpenMC)
 [![Python 3.9](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/release/python-390/)
+![](https://readthedocs.org/projects/cad-to-openmc/badge/?version=latest&style=flat)
+
 
 # CAD_to_OpenMC
 This is a python package intended to establish an open source link between CAD tools in general and the neutron and photon transport code OpenMC. It is inspired by [Paramak](https://github.com/fusion-energy/paramak), and borrows concepts from [step_to_h5m]( https://github.com/fusion-energy/step_to_h5m).
@@ -14,6 +16,8 @@ CAD_to_OpenMC uses cadQuery and its links to OCCT
 
 The code structure relies on a main class *Assembly*, which maintains the geometry in terms of a list of instances of the subclass Entity.
 A geometry is imported from a (set of) .step files into the entity-list. This list is passed on to a mesher-class which generates a meshed geometry.
+
+CAD_to_OpenMC's documentaion is moving to: [](https://cad-to-openmc.readthedocs.io/).
 
 # Other options
 
