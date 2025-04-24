@@ -1,5 +1,5 @@
 |Main | Development|
-|---|---|---]
+|---|---|
 |[![Main branch](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml)| [![Development branch](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml/badge.svg?branch=develop)](https://github.com/openmsr/CAD_to_OpenMC/actions/workflows/python-app.yml)|
 
 ![GitHub License](https://img.shields.io/github/license/openmsr/CAD_to_OpenMC)
