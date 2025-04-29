@@ -15,6 +15,8 @@ CAD_to_OpenMC uses cadQuery and its links to OCCT
 The code structure relies on a main class *Assembly*, which maintains the geometry in terms of a list of instances of the subclass Entity.
 A geometry is imported from a (set of) .step files into the entity-list. This list is passed on to a mesher-class which generates a meshed geometry.
 
+We've written a paper covering this software: [![status](https://joss.theoj.org/papers/fc9555a355e3d399303a371bfce633f5/status.svg)](https://joss.theoj.org/papers/fc9555a355e3d399303a371bfce633f5)
+
 # Other options
 
 CAD_to_OpenMC is certainly not the only package that tries to solve this problem. Other options include:
