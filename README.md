@@ -90,7 +90,7 @@ CAD_to_OpenMC lives its life in the open on github. As such, please report issue
 We will show a few very simple uses-cases below to get you started using CAD_to_OpenMC, starting with a simply utility script, and then some more examples showing a few of the options later.
 
 ## Simple utility script
-This is the fastest way of getting up and running. A very basic script to process the file 'geometry.step' into a geometry useful for OpenMC in the 'geometry.h5m':
+This is the fastest way of getting up and running. A very basic script to process a file called 'geometry.step' into a geometry useful for OpenMC in the 'geometry.h5m'-file:
 ```python
 import CAD_to_OpenMC.assembly as ab
 
@@ -107,7 +107,7 @@ import openmc
 universe=openmc.DAGMCUniverse('geometry.h5m').bounded_universe(padding_distance=10)
 geometry=openmc.Geometry(universe)
 ```
-Please note that you also have to define materials according to the tags in the h5m-file for openmc to run.
+Please note that you also have to define materials according to the tags in the h5m-file for OpenMC to run, and of course create the geometry file ```geometry.step```. Some simple examples reside in the subdirectory ```examples/step_files```.
 
 ## 7 pin test case
 The follwing code-snippet can now be run to explore the capabilities of Assembly/step_to_h5m. We supply a couple of example .step-files in the examples directory. In this example we'll be using a geometry with a set of 7 pin-cells.
@@ -115,14 +115,14 @@ The follwing code-snippet can now be run to explore the capabilities of Assembly
 ```python
   import CAD_to_OpenMC.assembly as ab
   a=ab.Assembly()
-  a.stp_files=["examples/7pin.step"]
+  a.stp_files=["tests/7pin.step"]
   a.import_stp_files()
   a.solids_to_h5m()
 ```
 as of version 0.2.6 a simpler version of this test-script may be used as we have added a small set of convenience functions. One possibility is:
 ```python
   import CAD_to_OpenMC.assembly as ab
-  a=ab.Assembly(['examples/7pin.step'])
+  a=ab.Assembly(['tests/7pin.step'])
   a.run()
 ```
 which will read the 7pin.step example file and output a file by the default name dagmc.h5m
@@ -177,7 +177,7 @@ This option has more than one meaning depending on which backend you have chosen
 
 As of version 0.3 We also distribute a utility script (in the scripts directory) that should be helpful in creating meshes. An example run could look like this, which furthermore sets the implicit complement to be air. (See below for more on implicit complement):
 ```bash
-  c2omc_step2h5m examples/7pin.step --threads=1 --verbose=2 --implc=air --backend=stl2
+  c2omc_step2h5m tests/7pin.step --threads=1 --verbose=2 --implc=air --backend=stl2
 ```
 For a description of all available command line options simply run
 ```bash
