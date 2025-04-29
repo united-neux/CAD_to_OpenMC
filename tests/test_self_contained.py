@@ -1,7 +1,6 @@
 import CAD_to_OpenMC.assembly as ab
 import subprocess as sp
 import sys
-import h5py
 import numpy as np
 import pathlib as pl
 
@@ -238,7 +237,8 @@ def test_roundtrip():
         ds1=f0['tstt']['elements']['Tri3']['connectivity']
         found_h5py = True
     except:
-        pass
+        print("Warning: h5py-library not found - skipping check of data in output file")
+        found_h5py = False
 
     if found_h5py:
         assert np.all(ds0 == ds1)

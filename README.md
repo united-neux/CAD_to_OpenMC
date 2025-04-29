@@ -76,7 +76,7 @@ If instead you prefer to use a [conda-environment](https://docs.conda.io/project
 You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so. In many cases conda and mamba are already configured by default to use the conda-forge channel. If that is the case you may omit "-c conda-forge".
 
 ## Verifying your installation
-Should you wish to do so - you may verify your installation of CAD_to_OpenMC by running the script `self_contained_test.py`-script located in the tests directory. This writes a step-file, converts it to triangles, and checks that the created triangles have vertices as expected.
+Should you wish to do so - you may verify your installation of CAD_to_OpenMC by running the script `self_contained_test.py`-script located in the tests directory. This writes a step-file, converts it to triangles, and checks that the created triangles have vertices as expected. N.b. the last check requires that the library ```h5py``` is installed. If not, the vertex-check is skipped (The entire round trip from ```.step``` to ```.h5m``` is done however).
 
 # Known problems
 - At present the parallel meshing option is buggy - it is therefore highly recommended to set the mesher to only use 1 thread. The team is working on a solution for this. See issue [#80](https://github.com/openmsr/CAD_to_OpenMC/issues/80)
