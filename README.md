@@ -17,6 +17,8 @@ CAD_to_OpenMC uses cadQuery and its links to OCCT
 The code structure relies on a main class *Assembly*, which maintains the geometry in terms of a list of instances of the subclass Entity.
 A geometry is imported from a (set of) .step files into the entity-list. This list is passed on to a mesher-class which generates a meshed geometry.
 
+We've written a paper covering this software: [![status](https://joss.theoj.org/papers/fc9555a355e3d399303a371bfce633f5/status.svg)](https://joss.theoj.org/papers/fc9555a355e3d399303a371bfce633f5)
+
 # Other options
 
 CAD_to_OpenMC is certainly not the only package that tries to solve this problem. Other options include:
@@ -46,7 +48,7 @@ _replace \<name\> with an arbitrary name for your virtual environment_
 1. In the directory where you want your environment to reside do: ```python -m venv <name>```
 2. Activate the environment: ```source <name>/bin/activate```
 3. Build and install moab (if not already installed). The moab team relies on conda for standard installation but are working on a pip-based solution. Once that is done moab would simply be added to the requirements-file instead.
-    1. Clone the moab code-repository: e.g. ```git clone git@bitbucket.org:fathomteam/moab.git```
+    1. Clone the moab code-repository: e.g. ```git clone https://bitbucket.org/fathomteam/moab.git```
     2. Configure and build the code:
     ```bash
       mkdir build;
