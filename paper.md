@@ -249,7 +249,7 @@ burst-rods each (see tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_po
 | 4   | -0.469   | -0.447   | -2.970| 0.98446       | 0.98745       | 0.98359       | 0.9883        |
 | 5   | -0.319   | -0.656   | 0.0   | 0.98980       | 0.98706       | 0.98844       | 0.9933        |
 Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the Godiva-IV benchmark/simplified model from HEU-MET-FAST-086
-[@icsbep_2022; @hagopian2018updating]\label{tab_bm_giv_rod_pos}. Measures in inches
+[@icsbep_2022; @goda2021]\label{tab_bm_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
 criticality numbers for the device. MC refers to simulated Monte Carlo estimates, whereas Lit. refers
 to numbers drawn from the benchmark report. CAD0 is a single-mesh model, whereas CAD refers to a model where core, control rods, and burst rods have been discretized separately, then put together as separate universes in OpenMC.
@@ -261,8 +261,8 @@ to numbers drawn from the benchmark report. CAD0 is a single-mesh model, whereas
 | 3   | -0.493   | -3.794   | 0.0   | 0.97885      | 0.98330       | 0.9887        |
 | 4   | -0.469   | -0.447   | -2.970| 0.98352      | 0.98426       | 0.9897        |
 | 5   | -0.319   | -0.656   | 0.0   | 0.98390      | 0.98969       | 0.9945        |
-Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the detailed Godiva-IV model from HEU-MET-FAST-086
-[@icsbep_2022; @hagopian2018updating]\label{tab_det_giv_rod_pos}. Measures in inches
+Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the detailed Godiva-IV model from HEU-MET-FAST-08
+[@icsbep_2022; @goda2021]\label{tab_det_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
 criticality numbers for the device. MC refers to simulated Monte Carlo estimates, whereas Lit. refers
 to numbers drawn from the benchmark report. In the detailed case, for simplicity, only a separately discretized model was run.
