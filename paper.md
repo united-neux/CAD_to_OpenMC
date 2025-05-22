@@ -40,8 +40,8 @@ DAGMC-library, which is usable by the main particle-transport packages.
 
 
 # Statement of need
-Most Monte Carlo neutronics, and general particle transport (e.g., OpenMC, GEANT4, MCNP, Fluka) [@openmc_2013;
-@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014]  are ubiquitous in nuclear science. They're used to
+Most Monte Carlo neutronics, and general particle transport software packages (e.g., OpenMC, GEANT4, MCNP, Fluka) [@openmc_2013;
+@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014] are ubiquitous in nuclear science. They're used to
 assess performance of the system, estimate radiation levels, shielding requirements, among many other uses.
 Almost all of them use the concept of Constructive Solid Geometry (CSG) to describe the geometry or
 scene in which computations are to be performed. Computations generally amount
