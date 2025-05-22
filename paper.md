@@ -40,8 +40,8 @@ DAGMC-library, which is usable by the main particle-transport packages.
 
 
 # Statement of need
-Most Monte Carlo neutronics-, and general particle transport (e.g. OpenMC, GEANT4, MCNP, Fluka [@openmc_2013;
-@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014]) software packages are ubiquitous in nuclear science. They're used to
+Most Monte Carlo neutronics, and general particle transport (e.g., OpenMC, GEANT4, MCNP, Fluka) [@openmc_2013;
+@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014]  are ubiquitous in nuclear science. They're used to
 assess performance of the system, estimate radiation levels, shielding requirements, among many other uses.
 Almost all of them use the concept of Constructive Solid Geometry (CSG) to describe the geometry or
 scene in which computations are to be performed. Computations generally amount
@@ -49,7 +49,7 @@ to trace a large number of rays through the geometry. Such models range in
 complexity from simple scenes of only a few geometrical objects to several
 million, but are generally considered tricky to work with, in that all object
 boundaries must be constructed from analytical descriptions of geometrical
-primaries (cylinders, planes, 2nd order surfaces, etc).
+primaries (cylinders, planes, 2nd-order surfaces, etc.).
 Most engineering design, however, is performed using CAD tools, which are
 optimized for ease of design.
 
@@ -95,7 +95,7 @@ In a simplified picture, objects consist of a set of bounded surfaces (faces), f
 which themselves consist of line segments connecting points or simply mathematical descriptions of curves.
 More specifically, the BREP-description used in OCCT also includes notions of shells (the boundary of a volume), loops (a circular set of edges), etc.
 The BREP concept is subtly but fundamentally different from CSG, where objects are formed by
-boolean operations on halfspaces. E.g., the OCCT BREP-description allows several more types of operations for forming a geometry,
+boolean operations on halfspaces. For example, the OCCT BREP-description allows several more types of operations for forming a geometry,
 such as extrusions and rotations.
 
 Thus, a need for conversion always exists, regardless
@@ -135,8 +135,8 @@ splitting the larger into two or more sub surfaces.
 CAD_to_OpenMC is constructed such that it is flexible in terms of the
 algorithms used to generate triangularized surfaces that approximate the
 geometries, known as back-ends.
-The present release supports a set of backends: {'gmsh','stl','stl2','db'}. In
-most cases, we have encountered that 'stl2' performs well. It uses a very basic
+The present release supports a set of backends: `{'gmsh','stl','stl2','db'}`.
+In most cases, we have encountered that `stl2` performs well. It uses a very basic
 algorithm, with no restriction on triangle aspect ratio, but also produces
 discretized geometry files of moderate size. In practice, the aspect ratio does
 not appear to be a problem for particle transport. In case the same
@@ -144,25 +144,25 @@ discretization is to be used for other types of applications, care should be
 taken.
 
 In some cases, the simple algorithm fails to create a watertight model. In such
-cases, we recommend using the 'db' backend if available. The 'gmsh' backend consistently
-produces a practical model, but often has the problem that it is memory hungry. E.g.,
+cases, we recommend using the `db` backend if available. The `gmsh` backend consistently
+produces a practical model, but often has the problem that it is memory hungry. For example,
 neither the ARE nor the MSRE (see below) models could be run this way on our
-available hardware (64GB workstation).
+available hardware (64 GB workstation).
 
 
 ### Material tags
 <!-- The way material tags are extracted here -->
 If needed, CAD_to_OpenMC can use the CAD-generated part names as material tags.
 The default behavior is to use the first part of the part name as a material
-tag. This may be changed by supplying a hash table, i.e. Python dictionary, as
+tag. This may be changed by supplying a hash table, i.e., Python dictionary, as
 the tags-argument. Here, the keys to the table are interpreted as regular
 expressions, and the values are taken to be material tags to use. Parts, whose
-names do not match any of the regexp-keys, are tagged as vacuum by default. If,
+names do not match any of the regular expression keys, are tagged as vacuum by default. If,
 however, a flag is set, then the material tag is extracted from the part name,
 as if no list of tags is supplied. This allows to re-tag only a subset of the
 parts.
-The below example shows how to tag all parts with the name "wall" in them with "concrete"
-and all parts ending with bellows with "steel".
+The below example shows how to tag all parts with the name `wall` in them with `concrete`
+and all parts ending with bellows with `steel`.
 ```python
 tag_dict = {".*bellows" : "steel", ".*wall.*" : "concrete"}
 ```
@@ -182,12 +182,12 @@ CAD_to_OpenMC can add an implicit complement to the output file. That is, the ma
 that will be applied to any part of the geometry which is *not* claimed by any
 CAD part. This is done by simply assigning the name of the material as a string
 to the implicit complement attribute of the base Assembly object.
-If the attribute is set C2O assigns the extra material tag (with a suffix of \'\_comp\')
+If the attribute is set C2O assigns the extra material tag (with a suffix of `\_comp\`)
 to the last part handled. That material tag gets picked up by the DAGMC system and is used for any unclaimed volume.
 
 # Results
-We have chosen 3 reactor models as test systems. A tabletop reactor and two full-scale molten salt reactors. The former
-(GODIVA IV) model is included in the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086; the latter two were part of the motel salt reactor program at ORNL.
+We have chosen three reactor models as test systems. A tabletop reactor and two full-scale molten salt reactors. The former
+(GODIVA IV) model is included in the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086; the latter two were part of the molten salt reactor program at ORNL.
 
 ## GODIVA IV
 This model was chosen since it exhibits moderate complexity and has a generous set of experimental data to benchmark against.
@@ -195,19 +195,21 @@ It is detailed enough to be cumbersome to model quickly using CSG but not with
 CAD. Further, CSG models (for MCNP) may be found in the published benchmark,
 along with detailed experimental validation data allowing for practical
 comparison.
-The reactor consists of a cylindrical core geometry (\autoref{fig:GIV_CAD}) held by 3 sets of clamps set
+The reactor consists of a cylindrical core geometry (\autoref{fig:GIV_CAD}) held by three sets of clamps set
 at 120 deg. offset. Additionally, the core has three vertical holes (similarly
 120 deg. apart), into which control and burst rods may be inserted from below
 by vertical actuators. The rods themselves are similar in composition to the
 fuel elements.
 
-The benchmark includes 5 experimental cases, which differ in terms of control- and burst-rod positions.
-Also, there are 3 geometries described:
+The benchmark includes five experimental cases, which differ in terms of control- and burst-rod positions.
+Also, there are three geometries described:
+
 1. a detailed model which includes as-built things (curved clamp etc.),
 2. simplified model, where all surfaces are along the principal axis, all corners 90 deg. etc., and
 3. cylindrical symmetric model, to allow 2D computations.
-The benchmark reports only experimental results for the 2 first ones, but contains MCNP geometries for
-all 3 in [@icsbep_2022]. The 3rd model is created in order to use some legacy analysis tools which are purely 1D/2D.
+
+The benchmark reports only experimental results for the two first ones, but contains MCNP geometries for
+all three in [@icsbep_2022]. The 3rd model is created in order to use some legacy analysis tools which are purely 1D/2D.
 
 Corresponding to \autoref{fig:GIV_CAD}, \autoref{fig:GIV_meshed} shows the discretized version of the two reactor models used for our further analysis.
 
