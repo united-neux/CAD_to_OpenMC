@@ -41,14 +41,8 @@ DAGMC-library, which is usable by the main particle-transport packages.
 
 # Statement of need
 Most Monte Carlo neutronics, and general particle transport software packages (e.g., OpenMC, GEANT4, MCNP, Fluka) [@openmc_2013;
-@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014] are ubiquitous in nuclear science. They're used to
-assess performance of the system, estimate radiation levels, shielding requirements, among many other uses.
-Almost all of them use the concept of Constructive Solid Geometry (CSG) to describe the geometry or
-scene in which computations are to be performed. Computations generally amount
-to trace a large number of rays through the geometry. Such models range in
-complexity from simple scenes of only a few geometrical objects to several
-million, but are generally considered tricky to work with, in that all object
-boundaries must be constructed from analytical descriptions of geometrical
+@geant4_2003; @mcnp_2022; @fluka_2005; @fluka_2014] are ubiquitous in nuclear science.
+Almost all of these use Constructive Solid Geometry (CSG) to describe the geometry in which computations are to be performed. CSG is computationally efficient but also tricky to work with, in that all object boundaries must be constructed from analytical descriptions of geometrical
 primaries (cylinders, planes, 2nd-order surfaces, etc.).
 Most engineering design, however, is performed using CAD tools, which are
 optimized for ease of design.
@@ -61,12 +55,12 @@ into two categories.
 2. tools that allow ray-tracing on CAD geometries, or close derivatives thereof.
 
 In the second category, one of the most widespread open source solutions is DAGMC [@wilson_acceleration_2010],
-a library with couplings to all OpenMC, MCNP, fluka, and Geant4.
+a library with couplings to OpenMC, MCNP, fluka, and Geant4.
 DAGMC is proven to be fast and reliable, yet one hurdle remains: DAGMC
 requires a discretized (meshed) approximation of the CAD geometry. In general, it is not a trivial requirement.
 
 CAD software packages are, for the most
-part, proprietary packages with little to no focus on being interchangeable. One
+part, proprietary packages with little focus on being interchangeable. One
 upshot of this is a notable lack of overlapping standard formatting between
 packages, the exception being the STEP-format, which is backed by an
 international standard [@stepStd_2024]. Thus, a tool should support this format if
@@ -80,21 +74,19 @@ While other active projects exist that target similar problems (e.g., cad_to_dag
 CAD_to_OpenMC is designed with generality in mind. This is defined as:
 First, it is aimed at
 working for all step-geometries, with no assumptions on geometry. Second, it must be relatively easy
-to add code for a new backend should one wish to do so. From this requirement stems the code structure as it is,
- with one frontend and several backend classes. This may be seen as a measure to enhance the longevity of the project.
+to add code for a new backend should one wish to do so. Hence the code structure with one frontend and several backend classes.
 Last, it must be easy to extract, generate, and manipulate material tags from the underlying step model. As models become large and complex, maintaining a separate list of materials, in sequence, is seen as cumbersome and error-prone.
 
 # Method
-CAD_to_OpenMC uses OCCT [@occt3d] to interact with CAD geometries
-and its handling of step-files. Once the geometry has been imported, one of
-several meshing back-ends may be called to create a discretized version of the
-geometry. In the end, the so-generated geometry is exported into the DAGMC-expected format.
+CAD_to_OpenMC uses OCCT [@occt3d] to interact with CAD geometries, i.e. step-files. Once the geometry has been imported, one of
+several meshing backends may be called to create a discretized version of the
+geometry. In the end, the generated geometry is exported into the DAGMC-expected format.
 
-Similarly to most CAD systems, OCCT uses a hierarchical boundary representation model (BREP).
+Similar to most CAD systems, OCCT uses a hierarchical boundary representation model (BREP).
 In a simplified picture, objects consist of a set of bounded surfaces (faces), formed by a set of boundaries (edges),
 which themselves consist of line segments connecting points or simply mathematical descriptions of curves.
 More specifically, the BREP-description used in OCCT also includes notions of shells (the boundary of a volume), loops (a circular set of edges), etc.
-The BREP concept is subtly but fundamentally different from CSG, where objects are formed by
+The BREP concept fundamentally different from CSG, where objects are formed by
 boolean operations on halfspaces. For example, the OCCT BREP-description allows several more types of operations for forming a geometry,
 such as extrusions and rotations.
 
@@ -116,32 +108,24 @@ The first case puts a constraint on the absolute tolerance of the
 discretization, i.e., triangles have to be small enough not to cause crossing
 surfaces.
 
-In terms of case b, the discretization process must take care not to
-re-evaluate any surface that is shared. Instead, it must reuse the triangles of
-the former instance. This means that objects cannot be independently processed.
-The whole process is generally handled by the underlying geometry engine [@occt3d] through
-its hierarchical model. Objects simply store links to surfaces
-and their triangularizations (similar for curves --- line segments).
-CAD_to_OpenMC handles this by generating a hash code for each surface upon
-processing. Each time a surface is encountered, it is examined, and if the
-surface has already been encountered, it will be reused, not recomputed.
+In terms of case b, the discretization process must only process a shared surface once.
+his means that objects cannot be independently processed. CAD_to_OpenMC handles this by
+generating a hash code for each surface upon
+processing. Each time a surface is encountered, the code is checked, and if the
+surface has already been encountered, it will be reused.
 
-In the latter case (c), imprinting has to be performed. This is the process
-where the boundary curves of the smaller surface is projected onto the larger,
-splitting the larger into two or more sub surfaces.
+In the last case (c), imprinting has to be performed. This is the process
+where the boundary curves of one surface are projected onto another, splitting it into two or more sub surfaces.
 
 <!-- meshing backends -->
 ### Meshing backends
-CAD_to_OpenMC is constructed such that it is flexible in terms of the
-algorithms used to generate triangularized surfaces that approximate the
-geometries, known as back-ends.
-The present release supports a set of backends: `{'gmsh','stl','stl2','db'}`.
-In most cases, we have encountered that `stl2` performs well. It uses a very basic
+CAD_to_OpenMC is made to be flexible in terms of the
+algorithms, backends, used to generate triangularized surfaces.
+The present release supports a range of backends: `{'gmsh','stl','stl2','db'}`.
+In most cases `stl2` performs well. It uses a very basic
 algorithm, with no restriction on triangle aspect ratio, but also produces
 discretized geometry files of moderate size. In practice, the aspect ratio does
-not appear to be a problem for particle transport. In case the same
-discretization is to be used for other types of applications, care should be
-taken.
+not pose problem for particle transport but other applications are more sensitive.
 
 In some cases, the simple algorithm fails to create a watertight model. In such
 cases, we recommend using the `db` backend if available. The `gmsh` backend consistently
@@ -154,13 +138,10 @@ available hardware (64 GB workstation).
 <!-- The way material tags are extracted here -->
 If needed, CAD_to_OpenMC can use the CAD-generated part names as material tags.
 The default behavior is to use the first part of the part name as a material
-tag. This may be changed by supplying a hash table, i.e., Python dictionary, as
-the tags-argument. Here, the keys to the table are interpreted as regular
-expressions, and the values are taken to be material tags to use. Parts, whose
-names do not match any of the regular expression keys, are tagged as vacuum by default. If,
-however, a flag is set, then the material tag is extracted from the part name,
-as if no list of tags is supplied. This allows to re-tag only a subset of the
-parts.
+tag. This may be changed by supplying a dictionary, as
+the tags-argument. Here, the keys are regular
+expressions, and the values are the material tags to use. Unmatched parts are tagged as vacuum (the default) by may be tagged by extracte part names. 
+Thu,s a subset of the parts may be retagged.
 The below example shows how to tag all parts with the name `wall` in them with `concrete`
 and all parts ending with bellows with `steel`.
 ```python
@@ -179,36 +160,27 @@ I am now going to refer to the equation: \autoref{eq:integral}.
 
 ## Implicit complement
 CAD_to_OpenMC can add an implicit complement to the output file. That is, the material tag
-that will be applied to any part of the geometry which is *not* claimed by any
-CAD part. This is done by simply assigning the name of the material as a string
+applied to any part of the geometry *not* claimed by any
+CAD part. This is done by simply assigning the name of the material as a string (with a suffix of `\_comp\`)
 to the implicit complement attribute of the base Assembly object.
-If the attribute is set C2O assigns the extra material tag (with a suffix of `\_comp\`)
-to the last part handled. That material tag gets picked up by the DAGMC system and is used for any unclaimed volume.
+That string gets picked up by DAGMC system and is used for the unclaimed volume.
 
 # Results
 We have chosen three reactor models as test systems. A tabletop reactor and two full-scale molten salt reactors. The former
 (GODIVA IV) model is included in the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086; the latter two were part of the molten salt reactor program at ORNL.
 
 ## GODIVA IV
-This model was chosen since it exhibits moderate complexity and has a generous set of experimental data to benchmark against.
-It is detailed enough to be cumbersome to model quickly using CSG but not with
-CAD. Further, CSG models (for MCNP) may be found in the published benchmark,
-along with detailed experimental validation data allowing for practical
-comparison.
-The reactor consists of a cylindrical core geometry (\autoref{fig:GIV_CAD}) held by three sets of clamps set
-at 120 deg. offset. Additionally, the core has three vertical holes (similarly
-120 deg. apart), into which control and burst rods may be inserted from below
-by vertical actuators. The rods themselves are similar in composition to the
+This reactor consists of a cylindrical core (\autoref{fig:GIV_CAD}) held by three sets of clamps set. Additionally, the core has three vertical holes into which control and burst rods may be inserted from below. The rods themselves are similar in composition to the
 fuel elements.
 
 The benchmark includes five experimental cases, which differ in terms of control- and burst-rod positions.
-Also, there are three geometries described:
+Three geometries are described:
 
 1. a detailed model which includes as-built things (curved clamp etc.),
 2. simplified model, where all surfaces are along the principal axis, all corners 90 deg. etc., and
-3. cylindrical symmetric model, to allow 2D computations.
+3. cylindrically symmetric model.
 
-The benchmark reports only experimental results for the two first ones, but contains MCNP geometries for
+The benchmark reports only experimental results for the two first, but contains MCNP geometries for
 all three in [@icsbep_2022]. The 3rd model is created in order to use some legacy analysis tools which are purely 1D/2D.
 
 Corresponding to \autoref{fig:GIV_CAD}, \autoref{fig:GIV_meshed} shows the discretized version of the two reactor models used for our further analysis.
@@ -221,7 +193,7 @@ Corresponding to \autoref{fig:GIV_CAD}, \autoref{fig:GIV_meshed} shows the discr
 
 Figure \ref{fig:voldiff} shows
 differences in volumes between the discretized models and the exact CAD model
-for the various objects making up the parts. Volumes have been calculated using
+for the various objects in the model. Volumes have been calculated using
 a built-in feature of our CAD package, whereas volumes from the discretized models have
 been computed using the stochastic volume computation feature of OpenMC
 [@openmc_2013]. In the latter case, volumes are being computed by sampling a (large)
@@ -232,10 +204,10 @@ calculation can be run to an arbitrary set target tolerance.
 
 Generally, differences in volume have a much bigger influence on the neutronics
 of a reactor than do small boundary changes (with constant volume). Hence, this
-is a useful measure for performance. Note that the errors found (fig. \ref{fig:voldiff}) are dominated by
+is a useful measure for performance. The errors found (fig. \ref{fig:voldiff}) are dominated by
 the error in the stochastic volume estimator, not the volume error itself. This
 is evidenced by the very small error in burst- and control-rod volume for the
-detailed model, which was run with smaller tolerances. Additionally, we have used the benchmark CSG-model
+detailed model, which were run with smaller tolerances. Additionally, we have used the benchmark CSG-model
 to verify a few volumes in the detailed model. A CSG model generally yields shorter runtimes, which allows tighter
 tolerance while also remaining practical. We find that the CSG-benchmark deviates slightly from the CAD-model constructed
 from drawings, suggesting there is an underlying discrepancy internally in the benchmark, which may have to be addressed.
@@ -243,18 +215,17 @@ from drawings, suggesting there is an underlying discrepancy internally in the b
 The considered cases have different settings for the control- and
 burst-rods each (see tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_pos}).
 
-|case | CR 1 top | CR 2 top |BR top | $k_{eff}$ CAD0| $k_{eff}$ CAD | $k_{eff}$ CSG | $k_{eff}$ Lit.|
-|-----|------|-----|-----|----|----|----|
-| 1   | -4.001   | -0.449   | 0.0   | 0.98326       | 0.98026       | 0.98187       | 0.9865        |
-| 2   | -1.998   | -1.666   | 0.0   | 0.98427       | 0.98101       | 0.98185       | 0.9867        |
-| 3   | -0.493   | -3.794   | 0.0   | 0.98460       | 0.98124       | 0.98297       | 0.9878        |
-| 4   | -0.469   | -0.447   | -2.970| 0.98446       | 0.98745       | 0.98359       | 0.9883        |
-| 5   | -0.319   | -0.656   | 0.0   | 0.98980       | 0.98706       | 0.98844       | 0.9933        |
+|case | CR 1 top | CR 2 top |BR top | $k_{eff}$ CAD | $k_{eff}$ CSG | $k_{eff}$ Lit.|
+|-----|------|-----|-----|----|----|
+| 1   | -4.001   | -0.449   | 0.0   | 0.98026       | 0.98187       | 0.9865        |
+| 2   | -1.998   | -1.666   | 0.0   | 0.98101       | 0.98185       | 0.9867        |
+| 3   | -0.493   | -3.794   | 0.0   | 0.98124       | 0.98297       | 0.9878        |
+| 4   | -0.469   | -0.447   | -2.970| 0.98745       | 0.98359       | 0.9883        |
+| 5   | -0.319   | -0.656   | 0.0   | 0.98706       | 0.98844       | 0.9933        |
 Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the Godiva-IV benchmark/simplified model from HEU-MET-FAST-086
 [@icsbep_2022; @goda2021]\label{tab_bm_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
-criticality numbers for the device. MC refers to simulated Monte Carlo estimates, whereas Lit. refers
-to numbers drawn from the benchmark report. CAD0 is a single-mesh model, whereas CAD refers to a model where core, control rods, and burst rods have been discretized separately, then put together as separate universes in OpenMC.
+criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes numbers from the benchmark.
 
 |case | CR 1 top | CR 2 top |BR top | $k_{eff}$ CAD | $k_{eff}$ CSG | $k_{eff}$ Lit.|
 |-----|------|-----|-----|----|----|----|
@@ -266,21 +237,14 @@ to numbers drawn from the benchmark report. CAD0 is a single-mesh model, whereas
 Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the detailed Godiva-IV model from HEU-MET-FAST-08
 [@icsbep_2022; @goda2021]\label{tab_det_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
-criticality numbers for the device. MC refers to simulated Monte Carlo estimates, whereas Lit. refers
-to numbers drawn from the benchmark report. In the detailed case, for simplicity, only a separately discretized model was run.
+criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes numbers from the benchmark report.
 
-Each experimental case was modelled in CAD in two ways. First, the entire
-reactor, including burst- and control-rods in respective positions, was drawn in
-CAD, exported and converted to a transport-compatible geometry. Second, the
-core geometry, burst, and control-rod were exported and converted individually.
-In the latter case, the full reactor model is assembled when the transport
+The core geometry, burst, and control-rods were discretized individually
+The full reactor model is then assembled when the transport
 geometry is described within the confines of an OpenMC geometry. This yields
-the important advantage of a model in which the rods can be moved dynamically,
-i.e., not restricted to predefined cases locked in by the discretized geometry.
-In the case of the detailed model, minor adjustments had to be made to the stated
-measurements in order for the model to fit. The locking bolts had to be shortened slightly, and the height of the shelf
-of the inner intermediate sub-assembly plate was reduced. In both cases, the edits were ~= 1 mm and will not affect the results.
-We assume the errors are mere misprints in the drawings.
+a model in which the rods can be moved dynamically.
+
+Two minor adjustments ($\approx 1$ mm) had to be made to the stated measurements; locking bolts and intermediate sub-assembly plate, for the model to fit. Both edits were ~= 1 mm and did not affect the results. We assume the errors are misprints in the drawings.
 
 It is clear from tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_pos} that the agreement between model and
 experiment is not perfect, yet the difference between CAD-based and CSG-based
@@ -316,7 +280,7 @@ literature,$k_{eff,lit}$ [@cottrell_are_operation_1955; @robertson_msre_1965].
 
 
 # Discussion and Conclusion
-We submit that we have shown that the tool presented in this paper is a convenient tool for making CAD geometries available for Monte Carlo particle transport. By utilizing the DAGMC-layer, the resulting geometries are not restricted to OpenMC, but in fact may be used also in MCNP, fluka, etc. Experience has shown that a particularly useful feature is to extract tags from CAD-defined parts and interpret them as material tags for transport. This enables a consistent material naming scheme throughout the entire modeling procedure.
+We submit that the tool presented is a convenient tool for making CAD geometries available for Monte Carlo particle transport. By utilizing the DAGMC-layer, the resulting geometries are not restricted to OpenMC, but in fact may be used also in MCNP, fluka, etc. Experience has shown that a particularly useful feature is to extract tags from CAD-defined parts and interpret them as material tags for transport. This enables a consistent material naming scheme throughout the entire modeling procedure.
 
 Finally, as noted, other active projects exist targeting the problem. In the interest of efficiency and resource management, there are active efforts aiming unification, which may bear fruit in coming releases.
 
