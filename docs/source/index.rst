@@ -16,6 +16,7 @@ Contents
 
 .. toctree::
 
-   install.md
-   usage.md
-   api.rst
+   source/install.md
+   source/usage.md
+   source/fullscale.md
+   source/api.rst
