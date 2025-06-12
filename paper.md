@@ -193,14 +193,8 @@ Corresponding to \autoref{fig:GIV_CAD}, \autoref{fig:GIV_meshed} shows the discr
 
 Figure \ref{fig:voldiff} shows
 differences in volumes between the discretized models and the exact CAD model
-for the various objects in the model. Volumes have been calculated using
-a built-in feature of our CAD package, whereas volumes from the discretized models have
-been computed using the stochastic volume computation feature of OpenMC
-[@openmc_2013]. In the latter case, volumes are being computed by sampling a (large)
-number of points within a set boundary, while recording which volume each point falls
-within. The precision of the algorithm is directly governed by the number of
-points sampled, meaning a direct dependence on run time. In practice, the
-calculation can be run to an arbitrary set target tolerance.
+for the various objects in the model. We used the stochastic volume estimator of OpenMC.
+[@openmc_2013] for the discretized models.
 
 Generally, differences in volume have a much bigger influence on the neutronics
 of a reactor than do small boundary changes (with constant volume). Hence, this
@@ -239,10 +233,8 @@ Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the deta
 withdrawn from the fully inserted position. The two rightmost columns contain
 criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes numbers from the benchmark report.
 
-The core geometry, burst, and control-rods were discretized individually
-The full reactor model is then assembled when the transport
-geometry is described within the confines of an OpenMC geometry. This yields
-a model in which the rods can be moved dynamically.
+To get a model in which the rods can be moved, the core geometry, burst, and control-rods were discretized individually
+The full reactor model is then assembled as an OpenMC geometry.
 
 Two minor adjustments ($\approx 1$ mm) had to be made to the stated measurements; locking bolts and intermediate sub-assembly plate, for the model to fit. Both edits were ~= 1 mm and did not affect the results. We assume the errors are misprints in the drawings.
 
