@@ -196,8 +196,8 @@ differences in volumes between the discretized models and the exact CAD model
 for the various objects in the model. We used the stochastic volume estimator of OpenMC.
 [@openmc_2013] for the discretized models.
 
-Generally, differences in volume have a much bigger influence on the neutronics
-of a reactor than do small boundary changes (with constant volume). Hence, this
+Differences in volume often influence the neutronics
+of a reactor more than boundary shifts. Hence, this
 is a useful measure for performance. The errors found (fig. \ref{fig:voldiff}) are dominated by
 the error in the stochastic volume estimator, not the volume error itself. This
 is evidenced by the very small error in burst- and control-rod volume for the
