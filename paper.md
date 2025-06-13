@@ -59,34 +59,23 @@ a library with couplings to OpenMC, MCNP, fluka, and Geant4.
 DAGMC is proven to be fast and reliable, yet one hurdle remains: DAGMC
 requires a discretized (meshed) approximation of the CAD geometry. In general, it is not a trivial requirement.
 
-CAD software packages are, for the most
-part, proprietary packages with little focus on being interchangeable. One
-upshot of this is a notable lack of overlapping standard formatting between
-packages, the exception being the STEP-format, which is backed by an
-international standard [@stepStd_2024]. Thus, a tool should support this format if
-it is not to be tied to any particular CAD engine.
+Most CAD software packages are, though often proprietary packages, able to write to the STEP-format, which is backed by an
+international standard [@stepStd_2024]. For this reason, the STEP format was chosen as the input format.
 
 The CAD_to_OpenMC tool eases the process of generating a meshed description
 of a CAD-generated geometry (in the form of a step file) ready for inclusion in
 transport codes through DAGMC.
-
-While other active projects exist that target similar problems (e.g., cad_to_dagmc [@cadtodagmc], and stellarmesh [@stellarmesh]),
-CAD_to_OpenMC is designed with generality in mind. This is defined as:
-First, it is aimed at
-working for all step-geometries, with no assumptions on geometry. Second, it must be relatively easy
-to add code for a new backend should one wish to do so. Hence the code structure with one frontend and several backend classes.
-Last, it must be easy to extract, generate, and manipulate material tags from the underlying step model. As models become large and complex, maintaining a separate list of materials, in sequence, is seen as cumbersome and error-prone.
 
 # Method
 CAD_to_OpenMC uses OCCT [@occt3d] to interact with CAD geometries, i.e. step-files. Once the geometry has been imported, one of
 several meshing backends may be called to create a discretized version of the
 geometry. In the end, the generated geometry is exported into the DAGMC-expected format.
 
-Similar to most CAD systems, OCCT uses a hierarchical boundary representation model (BREP).
+OCCT uses a hierarchical boundary representation model (BREP).
 In a simplified picture, objects consist of a set of bounded surfaces (faces), formed by a set of boundaries (edges),
 which themselves consist of line segments connecting points or simply mathematical descriptions of curves.
 More specifically, the BREP-description used in OCCT also includes notions of shells (the boundary of a volume), loops (a circular set of edges), etc.
-The BREP concept fundamentally different from CSG, where objects are formed by
+The BREP concept is fundamentally different from CSG, where objects are formed by
 boolean operations on halfspaces. For example, the OCCT BREP-description allows several more types of operations for forming a geometry,
 such as extrusions and rotations.
 
@@ -108,11 +97,9 @@ The first case puts a constraint on the absolute tolerance of the
 discretization, i.e., triangles have to be small enough not to cause crossing
 surfaces.
 
-In terms of case b, the discretization process must only process a shared surface once.
-his means that objects cannot be independently processed. CAD_to_OpenMC handles this by
-generating a hash code for each surface upon
-processing. Each time a surface is encountered, the code is checked, and if the
-surface has already been encountered, it will be reused.
+In terms of case b, each surface must only be discretized once. CAD_to_OpenMC handles this by
+filling a hash table for surfaces upon
+processing, enabling reuse without reprocessing.
 
 In the last case (c), imprinting has to be performed. This is the process
 where the boundary curves of one surface are projected onto another, splitting it into two or more sub surfaces.
@@ -122,26 +109,17 @@ where the boundary curves of one surface are projected onto another, splitting i
 CAD_to_OpenMC is made to be flexible in terms of the
 algorithms, backends, used to generate triangularized surfaces.
 The present release supports a range of backends: `{'gmsh','stl','stl2','db'}`.
-In most cases `stl2` performs well. It uses a very basic
-algorithm, with no restriction on triangle aspect ratio, but also produces
-discretized geometry files of moderate size. In practice, the aspect ratio does
-not pose problem for particle transport but other applications are more sensitive.
-
-In some cases, the simple algorithm fails to create a watertight model. In such
-cases, we recommend using the `db` backend if available. The `gmsh` backend consistently
-produces a practical model, but often has the problem that it is memory hungry. For example,
-neither the ARE nor the MSRE (see below) models could be run this way on our
-available hardware (64 GB workstation).
-
+In most cases `stl2` performs well, but sometimes fails to produce a watertight mesh.
+In such cases, we recommend using the `db` backend if available. Further, the `gmsh` backend consistently
+produces a practical model, but is memory hungry.
 
 ### Material tags
 <!-- The way material tags are extracted here -->
-If needed, CAD_to_OpenMC can use the CAD-generated part names as material tags.
-The default behavior is to use the first part of the part name as a material
-tag. This may be changed by supplying a dictionary, as
+CAD_to_OpenMC can use the CAD part names as material tags.
+The default is to use the first part of the part name as a material
+tag. This may be changed by supplying a dictionary as
 the tags-argument. Here, the keys are regular
-expressions, and the values are the material tags to use. Unmatched parts are tagged as vacuum (the default) by may be tagged by extracte part names. 
-Thu,s a subset of the parts may be retagged.
+expressions, and the values are the material tags to use. Unmatched parts are tagged as vacuum (the default) but may be tagged by extracted part names. 
 The below example shows how to tag all parts with the name `wall` in them with `concrete`
 and all parts ending with bellows with `steel`.
 ```python
@@ -166,8 +144,7 @@ to the implicit complement attribute of the base Assembly object.
 That string gets picked up by DAGMC system and is used for the unclaimed volume.
 
 # Results
-We have chosen three reactor models as test systems. A tabletop reactor and two full-scale molten salt reactors. The former
-(GODIVA IV) model is included in the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086; the latter two were part of the molten salt reactor program at ORNL.
+We have chosen a reactor model as a test system: A tabletop reactor (GODIVA IV) model from the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086.
 
 ## GODIVA IV
 This reactor consists of a cylindrical core (\autoref{fig:GIV_CAD}) held by three sets of clamps set. Additionally, the core has three vertical holes into which control and burst rods may be inserted from below. The rods themselves are similar in composition to the
@@ -189,12 +166,11 @@ Corresponding to \autoref{fig:GIV_CAD}, \autoref{fig:GIV_meshed} shows the discr
 
 ![Discretized Godiva IV-models, detailed (left) and simplified (right) versions.\label{fig:GIV_meshed}](figs/both_meshed.pdf){#GIV_meshed width=50%}
 
-![Part-by-part comparison between volume calculations using stochastic volume estimation in OpenMC compared with direct volume calculations reported by CAD-software for the detailed model (green) and simplified benchmark model (magenta). The indicated intervals are the computational error margins, almost exclusively stemming from the estimated error in the stochastic volume computation. The additional black circles denote the relative difference between the extracted benchmark CSG-model (as computed by stochastic volume runs in OpenMC) and the CAD-model.\label{fig:voldiff}](figs/both_rel_voldiff.png)
+![Part-by-part comparison between volume calculations using stochastic volume estimation in OpenMC and volumes reported by CAD-software for the detailed (green) and simplified (magenta) benchmark models. The intervals are the computational error margins, almost exclusively stemming from the estimated error in the stochastic volume computation. The additional black circles denote the relative difference between the extracted benchmark CSG-model (as computed by stochastic volume runs in OpenMC) and the CAD-model.\label{fig:voldiff}](figs/both_rel_voldiff.png)
 
 Figure \ref{fig:voldiff} shows
-differences in volumes between the discretized models and the exact CAD model
-for the various objects in the model. We used the stochastic volume estimator of OpenMC.
-[@openmc_2013] for the discretized models.
+volume differences between discretized and exact CAD models
+for the various objects in the model.
 
 Differences in volume often influence the neutronics
 of a reactor more than boundary shifts. Hence, this
@@ -203,11 +179,11 @@ the error in the stochastic volume estimator, not the volume error itself. This
 is evidenced by the very small error in burst- and control-rod volume for the
 detailed model, which were run with smaller tolerances. Additionally, we have used the benchmark CSG-model
 to verify a few volumes in the detailed model. A CSG model generally yields shorter runtimes, which allows tighter
-tolerance while also remaining practical. We find that the CSG-benchmark deviates slightly from the CAD-model constructed
-from drawings, suggesting there is an underlying discrepancy internally in the benchmark, which may have to be addressed.
+tolerances while remaining practical. The CSG-benchmark deviates slightly from the CAD-model constructed
+from drawings, suggesting an underlying discrepancy internally in the benchmark.
 
 The considered cases have different settings for the control- and
-burst-rods each (see tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_pos}).
+burst-rods (see tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_pos}).
 
 |case | CR 1 top | CR 2 top |BR top | $k_{eff}$ CAD | $k_{eff}$ CSG | $k_{eff}$ Lit.|
 |-----|------|-----|-----|----|----|
@@ -216,7 +192,7 @@ burst-rods each (see tables \ref{tab_bm_giv_rod_pos} and \ref{tab_det_giv_rod_po
 | 3   | -0.493   | -3.794   | 0.0   | 0.98124       | 0.98297       | 0.9878        |
 | 4   | -0.469   | -0.447   | -2.970| 0.98745       | 0.98359       | 0.9883        |
 | 5   | -0.319   | -0.656   | 0.0   | 0.98706       | 0.98844       | 0.9933        |
-Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the Godiva-IV benchmark/simplified model from HEU-MET-FAST-086
+Table: Control-rod (CR) and burst-rod (BR) positions for the 5 cases of the Godiva-IV benchmark/simplified model from HEU-MET-FAST-086
 [@icsbep_2022; @goda2021]\label{tab_bm_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
 criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes numbers from the benchmark.
@@ -228,13 +204,10 @@ criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes
 | 3   | -0.493   | -3.794   | 0.0   | 0.97885      | 0.98330       | 0.9887        |
 | 4   | -0.469   | -0.447   | -2.970| 0.98352      | 0.98426       | 0.9897        |
 | 5   | -0.319   | -0.656   | 0.0   | 0.98390      | 0.98969       | 0.9945        |
-Table: Control rod (CR) and burst rod (BR) positions for the 5 cases of the detailed Godiva-IV model from HEU-MET-FAST-08
+Table: Control-rod (CR) and burst-rod (BR) positions for the 5 cases of the detailed Godiva-IV model from HEU-MET-FAST-08
 [@icsbep_2022; @goda2021]\label{tab_det_giv_rod_pos}. Measures in inches
 withdrawn from the fully inserted position. The two rightmost columns contain
 criticality numbers for the device. MC denotes Monte Carlo, whereas Lit. denotes numbers from the benchmark report.
-
-To get a model in which the rods can be moved, the core geometry, burst, and control-rods were discretized individually
-The full reactor model is then assembled as an OpenMC geometry.
 
 Two minor adjustments ($\approx 1$ mm) had to be made to the stated measurements; locking bolts and intermediate sub-assembly plate, for the model to fit. Both edits were ~= 1 mm and did not affect the results. We assume the errors are misprints in the drawings.
 
