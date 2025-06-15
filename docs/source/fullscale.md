@@ -15,7 +15,7 @@ the geometrical differences stemming from discretiztion errors are smaller than 
 \autoref{fig:msreAre} (left) shows pictures of the meshed MSRE and ARE geometries, including reactor enclosure control rods, etc.
 The Aircraft Reactor Experiment (ARE) and Molten Salt Reactor Experiment (MSRE) were two molten salt reactor experiments carried out at Oak Ridge National Laboratory; ARE in November '59 and MSRE was run between '65 and 70.
 In the confines of this article, this pair serves as examples of complex reactor geometries that can be handled by CAD_to_OpenMC. Very detailed CAD models and example scripts used to compute these numbers are available for the set, which we have used as inputs [@msreData; @areData].
-\autoref{tab_bmark} tabulates the $$k_{eff}$$-values computed using a materials composition set to mimic the reported values as closely as possible.
+\autoref{tab_bmark} tabulates the {math}`k_{eff}`-values computed using a materials composition set to mimic the reported values as closely as possible.
 It is clear that, similar to the case for the GODIVA IV device, the modelled
 values are not in complete agreement with the reported ones, yet this may be
 explained by possible discrepancies between the drawings in accessible reports and the actual experiment. Any engineering realities not written down in these reports are likely lost.
