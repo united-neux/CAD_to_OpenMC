@@ -22,7 +22,7 @@ explained by possible discrepancies between the drawings in accessible reports a
 This is particularly true for ARE, where the discrepancy is largest, and details are scarce.
 It should be noticed that the calculated keff for the MSRE case has better agreement than any other MSRE criticality benchmarks known to the authors.
 
-:::table:::
+:::{table}
 :label: tab_bmark
 
 | model | $$k_{eff}$$ | $$k_{eff,lit}$$ |
