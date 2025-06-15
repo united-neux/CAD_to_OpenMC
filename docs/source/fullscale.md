@@ -9,7 +9,7 @@ experiment with this kind of geometry as with a CSG-geometry, suggesting that
 the geometrical differences stemming from discretiztion errors are smaller than differences between (reported) model and reality. 
 
 ## Molten Salt Reactors
-![Rendering of triangularized models of the ARE- and MSRE-reactors as generated using CAD_to_OpenMC. The MSRE model (left) includes both reactor core, liquid fuel contained therein, graphite moderator stringers, as well as thermal shielding and reactor enclosure. The reactor pit _is_ included in the model, but we have excluded it from the image to make the core more visible. The ARE model (right) includes the set of three safety/shim rods and the regulating rod in the center.\label{fig:msreAre}](figs/msre_are.png)
+![Rendering of triangularized models of the ARE- and MSRE-reactors as generated using CAD_to_OpenMC. The MSRE model (left) includes both reactor core, liquid fuel contained therein, graphite moderator stringers, as well as thermal shielding and reactor enclosure. The reactor pit _is_ included in the model, but we have excluded it from the image to make the core more visible. The ARE model (right) includes the set of three safety/shim rods and the regulating rod in the center.\label{fig:msreAre}](../images/msre_are.png)
 
 
 \autoref{fig:msreAre} (left) shows pictures of the meshed MSRE and ARE geometries, including reactor enclosure control rods, etc.
