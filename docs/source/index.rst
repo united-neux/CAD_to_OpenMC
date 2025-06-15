@@ -21,5 +21,5 @@ Contents
 
    install.md
    usage.md
-   api.rst
    fullscale.md
+   api.rst
