@@ -1,4 +1,4 @@
-Welcome to The documentation for CAD_to_OpenMC
+Welcome to the documentation for CAD_to_OpenMC
 ==============================================
 **CAD_to_OpenMC** is a python tool, made to ease the process of
 creating OpenMC-ready surface meshes from a CAD-generated representation
