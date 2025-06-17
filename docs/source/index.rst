@@ -14,6 +14,9 @@ in a scientific context, using models built by CAD to perform reactor simulation
 
    This project (and its documentation)is under active development.
 
+
+.. bibliography::
+
 Contents
 --------
 

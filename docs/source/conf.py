@@ -19,11 +19,16 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinxcontrib.bibtex",
     "myst_parser",
 ]
 
-myst_heading_anchors = 3
+bibtex_bibfiles = ["bibliography.bib"]
 
+myst_heading_anchors = 3
+myst_enable_extensions = [
+    "colon_fence",
+]
 intersphinx_mapping = {
     "rtd": ("https://docs.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
@@ -38,6 +43,8 @@ source_suffix = {
         ".md" : "markdown"
 }
 
+
+numfig = True
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"
