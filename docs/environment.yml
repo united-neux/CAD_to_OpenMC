@@ -10,3 +10,4 @@ dependencies:
    - pip
    - pip:
       - myst_parser
+      - sphinxcontrib-bibtex
