@@ -119,7 +119,7 @@ produces a practical model, but is memory hungry.
 The default is to use the first part of the part name as a material
 tag. This may be changed by supplying a dictionary as
 the tags-argument. Here, the keys are regular
-expressions, and the values are the material tags to use. Unmatched parts are tagged as vacuum (the default) but may be tagged by extracted part names. 
+expressions, and the values are the material tags to use. Unmatched parts are tagged as vacuum (the default) but may be tagged by extracted part names.
 The below example shows how to tag all parts with the name `wall` in them with `concrete`
 and all parts ending with bellows with `steel`.
 ```python
@@ -132,10 +132,10 @@ tag_dict = {".*bellows" : "steel", ".*wall.*" : "concrete"}
 applied to any part of the geometry *not* claimed by any
 CAD part. This is done by simply assigning the name of the material as a string (with a suffix of `\_comp\`)
 to the implicit complement attribute of the base Assembly object.
-That string gets picked up by DAGMC system and is used for the unclaimed volume.
+That string gets picked up by the DAGMC system and is used for the unclaimed volume.
 
 # Results
-We have chosen a reactor model as a test system: A tabletop reactor (GODIVA IV) model from the ICSBEP-benchmark project [@icsbep_2022] as case HEU-MET-FAST-086.
+As a test system we have chosen a tabletop reactor (GODIVA IV) model from the ICSBEP-benchmark project [@icsbep_2022] known as case HEU-MET-FAST-086.
 
 ## GODIVA IV
 This reactor consists of a cylindrical core (\autoref{fig:GIV_CAD}) held by three sets of clamps set. Additionally, the core has three vertical holes into which control and burst rods may be inserted from below. The rods themselves are similar in composition to the
@@ -211,7 +211,7 @@ works as intended.
 # Discussion and Conclusion
 We submit that the tool presented is a convenient tool for making CAD geometries available for Monte Carlo particle transport. By utilizing the DAGMC-layer, the resulting geometries are not restricted to OpenMC, but in fact may be used also in MCNP, Fluka, etc. Experience has shown that a particularly useful feature is to extract tags from CAD-defined parts and interpret them as material tags for transport. This enables a consistent material naming scheme throughout the entire modeling procedure.
 
-Finally, as noted, other active projects exist targeting the problem. In the interest of efficiency and resource management, there are active efforts aiming unification, which may bear fruit in coming releases.
+Finally, other active projects exist targeting the problem. In the interest of efficiency and resource management, there are active efforts aiming unification, which may bear fruit in coming releases.
 
 
 # References
