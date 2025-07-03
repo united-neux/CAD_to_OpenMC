@@ -52,11 +52,23 @@ def _replace(filename, string1, string2):
 
 
 class Entity:
-    """This class is a shallow container simply to allow iterating of the geometry model
-    where each object is merely a solid and a material tag.
-    This is to emulate some properties of the paramak shape class, but avoid depending on that.
-    At some point it should be able to import also Shapes.
-    For now it can just get a solid as input
+    """
+    Container class for Parts / Volumes
+
+    This class is a container to allow iterating through the geometry model, storing links to
+    data as we go along.
+    Each Entity is a glue-object that connects a step part with a h5m-volume, including positioning,
+    material tags, and links to surface mesh.
+
+
+    Parameters
+    ----------
+    solid : cadquery:Solid
+        The cadquery Solid object corresponding to the step-part
+    idx : int
+        The index number of the part/solid.
+    tag : string
+        Material tag of the part/solid
     """
 
     def __init__(self, solid=None, idx=0, tag="vacuum"):
@@ -75,9 +87,29 @@ class Entity:
         bb: tuple = (0, 0, 0),
         volume: float = 1,
         tolerance=1e-2,
-    ) -> bool:
-        """method returns a value for the similarity between the entity and the 3 parameters
-        cms, bb, and volume"""
+    ) -> float:
+        """
+        Quantifies similarity between an Entity and a set of parameters
+
+        Method returns a value for the similarity between the entity and the 3 parameters
+        cms, bb, and volume - presumable cvoming from another Entity
+
+        Parameters
+        ----------
+        center :
+            The center coordinate to compare with
+        bb :
+            Bounding box to compare with
+        volume :
+            Volume to compare with
+        tolerance :
+            Unused - will be removed
+
+        Returns
+        -------
+        float
+            How similar to the another with the given parameters?
+        """
         cms_rel_dist = np.linalg.norm(
             [
                 self.center.x - center[0],
@@ -98,7 +130,29 @@ class Entity:
         volume: float = 1,
         tolerance=1e-2,
     ) -> bool:
-        """method checks whether the entity can be regard as similar with another entities parameters"""
+        """
+        Quantifies similarity between an Entity and a set of parameters
+
+        Method compares an entity and the 3 parameters
+        cms, bb, and volume - presumable cvoming from another Entity, and reports
+        whether it is similar.
+
+        Parameters
+        ----------
+        center :
+            The center coordinate to compare with
+        bb :
+            Bounding box to compare with
+        volume :
+            Volume to compare with
+        tolerance :
+            Threshold for when an object is considered similar.
+
+        Returns
+        -------
+        bool
+            Is this Entity similar to the another with the given parameters?
+        """
         cms_close = (
             np.linalg.norm(
                 [
@@ -121,13 +175,32 @@ class Entity:
         return cms_close and bb_close and vol_close
 
     def export_stp(self):
-        """export the entity to a step-file using its tag as filename through cadquery export"""
+        """
+        Not yet implemented
+        """
         pass
 
 
 def idx_similar(entity_list, center, bounding_box, volume):
-    """returns the index in the solid_list for which a solid is similar in terms of bounding box, cms, and volume
-    If no similar object is found return -1.
+    """
+    Which objects (if any) are similar to the object specified by the set of parameters
+
+    Parameters
+    ----------
+    entity_list : List
+        List of entities to check agains the given parameters
+    center :
+        The center coordinate to compare with
+    bb :
+        Bounding box to compare with
+    volume :
+        Volume to compare with
+
+    Returns
+    -------
+    int
+        The index in the entity_list for which a solid is similar in terms of bounding box, cms, and volume
+        If no similar object is found return -1.
     """
     idx_found = []
     for i, ent in enumerate(entity_list):
@@ -180,10 +253,56 @@ def similar_solids(solid1_vol, solid1_bb, solid1_c, solid2_vol, solid2_bb, solid
     return dV + dBB + dCntr
 
 class Assembly:
-    """This class encapsulates a set of geometries defined by step-files
-    addtionally it provides access to meshing-utilities, and export to a DAGMC-enabled
-    h5m scene, which may be used for neutronics.
-    This class is based on (and borrows heavily from) logic from the paramak package.
+    """
+    Main class representing a geometry model to process
+
+    This class encapsulates a geometry defined by a set of step-files that are to be converted
+    into a single surface-meshed geometry.
+    N.b. if geometries are not overlapping it may be simple to use a single Assembly-object per
+    step-file and merge them later using the merge_h5m-methiod.
+
+    Parameters
+    ----------
+    stp_files : 
+        List of filenames of the step-files to be processed. Most often this is a lits with single member
+    verbose : int
+        verbosity level of output. 0: most quiet, 1: some output, 2+: a lot of diagnostic output
+    default_tag : str
+        Material tag to apply to objects where none is found or where no tag-conversion is applicable
+    implicit_complement : str or None
+        Material tag to be applied to the volume _not_ claimed by any object. If set to None, it is ignored.
+
+    Attributes
+    ----------
+    stp_files : List
+        List of filenames of the step-files to be processed.
+    verbose : int
+        verbosity level of output. 0: most quiet, 1: some output, 2+: a lot of diagnostic output
+    default_tag : string
+        Material tag to apply to objects where none is found or where no tag-conversion is applicable
+    delete_intermediate : bool
+        Should intermediate data-files be deleted after finishing a run? Superceded by "cleanup"
+    cleanup : bool
+        Delete the data-directory containing the intermediate data-files?
+    datadir : string
+        Data directory where intermediate data is stored. If == "." (default) a unique directory will be created
+    tags : dictionary
+        Dictionary of material tag-conversions to be applied after extracting tags from the step-file(s). Keys
+        are expected to be regexp-patterns to be matched agains the extracted tags (see also set_tag_delim), and
+        values are the atcual tags to be set. E.g. tags = {"steel.*" : "niobium"} will replace all tags starting with
+        "steel" with the tag "niobium".
+    sequential_tags : list
+        List of tages to be applied sequentially to a model. If set, this applies the tags in the list in the sequence
+        they are encountered in the step-file, until either one is exhausted. If the seq. tag list is exhausted,
+        remaining objects will retain the tag extracted from the step-file or get the default depending on whether
+        noextract_tags is set.
+    implicit_complement : string
+        Material tag to be applied to the volume _not_ claimed by any object.
+    noextract_tags : bool
+        If true, do not extract materials tags from the step-files to fill up.
+    tag_delim_pattern : string
+        Regex-pattern which determines what the constitutes the first section of a part name. The first bit is the
+        extracted material tag. E.g. with default setting, the names "steel pipe" and "steel_pipe" both become the tag "steel".
     """
 
     def __init__(
@@ -232,7 +351,24 @@ class Assembly:
         imprint: bool = False,
         **kwargs: dict,
     ):
-        """convenience function that assumes the stp_files field is set, etc and simply runs the mesher with the set options"""
+        """
+        Convenience function to easily run the processing sequence
+
+        This method merges the calls to import_stp_files, imprint, merge, and solids_to_h5m into a single call
+
+        parameters
+        ----------
+        backend : string
+            Mesh creatinon backend to use. Allowed values are 'stl', 'stl2', 'gmsh, and 'db'. The currently 
+            recommended choices ae "stl2" and "db".
+        h5m_filename : string
+            Filename of the created output data-file which will contains the meshed geometry
+        merge: bool
+            Perform a merge step during geometry processing
+        imprint: bool
+            Perform imprinting step during geometry processing
+
+        """
         self.import_stp_files(**kwargs)
         if imprint:
             self.imprint_all()
@@ -253,18 +389,26 @@ class Assembly:
         **kwargs: dict,
     ):
         """
-        Import a list of step-files.
+        Import a list of step-files and extract material tags.
 
-        Args:
-          tags: dictionary containing pairs of reg.exp. patterns and material tags. If not None, entities with
-              names matching the patterns will be assigned to corresponding tag. If no patterns match
-              the default_tag will be applied
-          match_anywhere: match patterns anywhere in the entitiy name
-          default_tag: The material tag that will be applied if no patterns are matched.
-          scale: overall scaling factor applied to all parts
-          translate: Translation vector to apply to all parts in the step-file.
-          rotate: Rotation angles to apply to the parts in the step-file.
-          vol_skip: list of volumes to skip meshing.
+        parameters
+        ----------
+        tags: dictionary
+            Contains pairs of reg.exp. patterns and material tags. If not None, entities with
+            names matching the patterns will be assigned to corresponding tag. If no patterns match
+            the default_tag will be applied
+        match_anywhere: bool
+            Match patterns anywhere in the entitiy name
+        default_tag: string
+            The material tag that will be applied if no patterns are matched.
+        scale: float
+            Overall scaling factor applied to all parts
+        translate: List
+            3D translation vector to apply to all parts in the step-file.
+        rotate: list
+            Rotation angles to apply to the parts in the step-file.
+        vol_skip: list
+            Numbers of volumes to skip meshing for.
         """
         for stp in self.stp_files:
           warn, ct = has_degenerate_toroids(stp,True)
@@ -500,6 +644,21 @@ class Assembly:
 
         **kwargs: dict,
     ):
+        """
+        Convert the imported list of solids into surface-meshed bounded objects
+
+        Main processing function that processes the list of already imported entities. It creates a
+        mesher backend object as appropriate and calls that to create a surface mesh.
+
+        parameters
+        ----------
+        h5m_filename: string
+            Name of the output file
+        backend: string
+            Name of the meshing backend to call. Allowed values are in ["gmsh", "stl", "stl2", "db"]
+        heal: bool
+            Use trimesh (if available) to perform a healing step on the surface normals"
+        """
         #if h5m_filename is not in cwd, run where it resides.
         cwd=pl.Path.cwd()
         h5m_path=pl.Path(h5m_filename)
@@ -1093,7 +1252,7 @@ class Assembly:
 
 def merge2h5m(assemblies =[], h5m_file: str ="dagmc.h5m", vtk: bool = True, verbose: int = 1):
     """
-    function that (re)performs the assembly of an h5m_file from a set of already triangularized
+    Function that (re)performs the assembly of an h5m_file from a set of already triangularized
     assemblies.
 
     Usage:
@@ -1103,11 +1262,16 @@ def merge2h5m(assemblies =[], h5m_file: str ="dagmc.h5m", vtk: bool = True, verb
         b.run( ... )
         merge2h5m([a,b],h5m_file='c.h5m')
 
-    params:
-        assemblies: Iterable of Assemblies
-        h5m_file: Filename of merged file
-        vtk: If True, also write a vtk-file of the structure
-        verbose; If == 0 do not write status messages
+    paramters
+    ---------
+    assemblies: list
+        Iterable of Assemblies.
+    h5m_file: string
+        Filename of merged file.
+    vtk: bool
+        If True, also write a vtk-file of the structure.
+    verbose: int
+        If == 0 do not write status messages to console.
     """
 
     #create a dummy object - this will not actually be used for anything.

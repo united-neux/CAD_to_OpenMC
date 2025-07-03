@@ -1,15 +1,19 @@
 # Configuration file for the Sphinx documentation builder.
 #
 # -- Project information -----------------------------------------------------
+import os, sys
 
 project = "CAD_to_OpenMC Project"
 copyright = "2025, CAD_to_OpenMC-team"
 author = "ebknudsen the Docs core team"
 
+sys.path.insert(0, os.path.abspath('../../src/'))
+
 master_doc = 'index'
 
 extensions = [
     "sphinx.ext.duration",
+    "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",

@@ -1,8 +1,7 @@
 API
 ===
 
-.. autosummary::
-   :toctree: generated
+.. toctree::
+   :maxdepth: 4
 
    CAD_to_OpenMC
-   CAD_to_OpenMC.assembly
