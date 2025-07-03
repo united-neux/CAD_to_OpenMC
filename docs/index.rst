@@ -18,5 +18,5 @@ Contents
 
    source/install.md
    source/usage.md
+   source/fullscale.md
    source/api.rst
-

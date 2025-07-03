@@ -8,6 +8,8 @@
 # CAD_to_OpenMC
 This is a python package intended to establish an open source link between CAD tools in general and the neutron and photon transport code OpenMC. It is inspired by [Paramak](https://github.com/fusion-energy/paramak), and borrows concepts from [step_to_h5m]( https://github.com/fusion-energy/step_to_h5m).
 
+This documentation is now also available on: [Read the Docs](https://cad-to-openmc.readthedocs.io)
+
 Although most CAD-tools use some other internal and/or native representation for geometry, most, if not all, will be able to export to the STEP-file format. Therefore this is the format we use
 
 CAD_to_OpenMC uses cadQuery and its links to OCCT
@@ -24,9 +26,25 @@ CAD_to_OpenMC is certainly not the only package that tries to solve this problem
 - [cad_to_dagmc]( https://github.com/fusion-energy/cad_to_dagmc )
 - [stellarmesher]( https://github.com/Thea-Energy/stellarmesh )
 
-These two packages solve the same problem as CAD_to_OpenMC, and in fact in many cases are interchangeable. See for instance [benchmark-zoo] ( https://github.com/fusion-energy/model_benchmark_zoo ).
+These two packages address the same problem as CAD_to_OpenMC, and in fact in many cases are interchangeable, but with different timelines and different design philosophy. See for instance [benchmark-zoo] ( https://github.com/fusion-energy/model_benchmark_zoo ).
 
-# To install/set up in a virtual python environment
+# Installation
+The following are the strict dependencies for CAD_to_OpenMC, as seen by PYPI/pip. In addition, it is practical to have trimesh installed.
+```
+gmsh
+pyparsing
+cadquery>=2.2.0
+cadquery-ocp>=7.7.0
+numpy
+networkx
+unidecode
+Cython
+```
+Note, it is possible to run CAD_to_OpenMC without gmsh installed. In this case the material-tag extraction feature is disabled, and you will have to supply a list of tags to be applied sequentially.
+Also note, if you follow the conda-route below, caquery-ocp is called ocp.
+
+## To install/set up in a virtual python environment
+
 _replace \<name\> with an arbitrary name for your virtual environment_
 1. In the directory where you want your environment to reside do: ```python -m venv <name>```
 2. Activate the environment: ```source <name>/bin/activate```
@@ -50,31 +68,36 @@ Should you wish to install the development version of this package you may do so
 
 5. Optionally install the msh refinement tool mmg (https://www.mmgtools.org), which may be run in conjunction with the cq/stl-mesher backend to avoid the high aspect ratio triangles that this backend tends to produce. Arch-linux users may install this from the AUR, otherwise get the source (and build from that) or binary builds from the mmg-site.
 
-# To install in a conda environment
+## To install in a conda environment
 _replace \<name\> with an arbitrary name for your virtual environment_
 
 If instead you prefer to use a [conda-environment](https://docs.conda.io/projects/conda/en/stable/), this is now as simple as:
 1. create an environment, e.g. ```conda create -n <name>```
 2. activate it: ```conda activate <name>```
-3. install CAD_to_OpenMC: ```conda install cad-to-openmc```
+3. install CAD_to_OpenMC: ```conda install -c conda-forge cad-to-openmc```
 
-You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so.
+You may of course replace conda with [mamba/micromamba](https://mamba.readthedocs.io/en/latest/), should you prefer to do so. In many cases conda and mamba are already configured by default to use the conda-forge channel. If that is the case you may omit "-c conda-forge".
+
+## Verifying your installation
+Should you wish to do so - you may verify your installation of CAD_to_OpenMC by running the script `self_contained_test.py`-script located in the tests directory. This writes a step-file, converts it to triangles, and checks that the created triangles have vertices as expected. N.b. the last check requires that the library ```h5py``` is installed. If not, the vertex-check is skipped (The entire round trip from ```.step``` to ```.h5m``` is done however).
 
 # Known problems
 - At present the parallel meshing option is buggy - it is therefore highly recommended to set the mesher to only use 1 thread. The team is working on a solution for this. See issue [#80](https://github.com/openmsr/CAD_to_OpenMC/issues/80)
 - Geometries which lead to degenerate toroidal surfaces in the step-files, can have problems. See issue [#94](https://github.com/openmsr/CAD_to_OpenMC/issues/94)
 - As is reported in [#98](https://github.com/openmsr/CAD_to_OpenMC/issues/98) on Ubuntu 22.04 there's a problem with python 3.12. Specifically with installing "nlopt", which is used by one of the dependencies of CAD_to_OpenMC. We recommend to stay with python < 3.11 until this has been fixed upstream.
 
-# Use cases
+# Contributing / Reporting
+CAD_to_OpenMC lives its life in the open on github. As such, please report issues with the code using the issue tracker at (https://github.com/united-neux/CAD_to_OpenMC/issues). Bug reports and contributions are always welcome. We prefer contributions to be in the form of pull-requests, but given the relatively small code-base of CAD_to_OoenMC we will also be happy to include your edit manually if you make it known to us through another channel. Should you have a general question, you may also open an issue (please add the label question to it). That way, other users may benefit from the reponse.
 
+# Use cases
 We will show a few very simple uses-cases below to get you started using CAD_to_OpenMC, starting with a simply utility script, and then some more examples showing a few of the options later.
 
 ## Simple utility script
-This is the fastest way of getting up and running. A very basic script to process the file 'geometry.step' into a geometry useful for OpenMC in the 'geometry.h5m':
+This is the fastest way of getting up and running. A very basic script to process a file called 'geometry.step' into a geometry useful for OpenMC in the 'geometry.h5m'-file:
 ```python
 import CAD_to_OpenMC.assembly as ab
 
-A=ab.Assembly('geometry.step')
+A=ab.Assembly(['geometry.step'])
 ab.mesher_config['threads']=1
 ab.mesher_config['tolerance']=1e-2
 ab.mesher_config['angular_tolerance']=1e-2
@@ -87,7 +110,7 @@ import openmc
 universe=openmc.DAGMCUniverse('geometry.h5m').bounded_universe(padding_distance=10)
 geometry=openmc.Geometry(universe)
 ```
-Please note that you also have to define materials according to the tags in the h5m-file for openmc to run.
+Please note that you also have to define materials according to the tags in the h5m-file for OpenMC to run, and of course create the geometry file ```geometry.step```. Some simple examples reside in the subdirectory ```examples/step_files```.
 
 ## 7 pin test case
 The follwing code-snippet can now be run to explore the capabilities of Assembly/step_to_h5m. We supply a couple of example .step-files in the examples directory. In this example we'll be using a geometry with a set of 7 pin-cells.
@@ -95,14 +118,14 @@ The follwing code-snippet can now be run to explore the capabilities of Assembly
 ```python
   import CAD_to_OpenMC.assembly as ab
   a=ab.Assembly()
-  a.stp_files=["examples/7pin.step"]
+  a.stp_files=["tests/7pin.step"]
   a.import_stp_files()
   a.solids_to_h5m()
 ```
 as of version 0.2.6 a simpler version of this test-script may be used as we have added a small set of convenience functions. One possibility is:
 ```python
   import CAD_to_OpenMC.assembly as ab
-  a=ab.Assembly(['examples/7pin.step'])
+  a=ab.Assembly(['tests/7pin.step'])
   a.run()
 ```
 which will read the 7pin.step example file and output a file by the default name dagmc.h5m
@@ -157,7 +180,7 @@ This option has more than one meaning depending on which backend you have chosen
 
 As of version 0.3 We also distribute a utility script (in the scripts directory) that should be helpful in creating meshes. An example run could look like this, which furthermore sets the implicit complement to be air. (See below for more on implicit complement):
 ```bash
-  c2omc_step2h5m examples/7pin.step --threads=1 --verbose=2 --implc=air --backend=stl2
+  c2omc_step2h5m tests/7pin.step --threads=1 --verbose=2 --implc=air --backend=stl2
 ```
 For a description of all available command line options simply run
 ```bash
