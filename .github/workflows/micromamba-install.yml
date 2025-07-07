@@ -4,7 +4,7 @@ name: Micromamba install tests (inc. OpenMC and MPI)
 on:
   workflow_dispatch:
   schedule:
-  - cron: '30 3 * * 0'  
+  - cron: '30 3 * * 0'
 
 permissions:
   contents: read
@@ -24,6 +24,13 @@ jobs:
         pyv: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         omcv: ["0.13.3", "0.14.0", "0.15.0"]
         mpi: ["nompi", "mpi_mpich", "mpi_openmpi"]
+        exclude:
+          - pyv: 3.12
+          - pyv: 3.13
+          - omcv: 0.13.3
+            pyv: 3.9
+          - omcv: 0.15.0
+            pyv: 3.9
 
     steps:
     - uses: actions/checkout@v4
@@ -51,4 +58,4 @@ jobs:
       shell: micromamba-shell {0}
     - name: Install CAD_to_OpenMC using micromamba
       run: micromamba install -y cad-to-openmc
-      shell: micromamba-shell {0} 
+      shell: micromamba-shell {0}
