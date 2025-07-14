@@ -1,5 +1,5 @@
 # This action is intended to run weekly on also testing versions of python
-name: Python application test on many versions
+name: Python application w OpenMC
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pyv: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        pyv: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
