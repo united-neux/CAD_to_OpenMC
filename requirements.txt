@@ -1,9 +1,8 @@
-gmsh
-pyparsing
-cadquery>=2.2.0
-cadquery-ocp>=7.7.0
-numpy
-networkx
-unidecode
-h5py
-Cython
+gmsh==4.14.0
+numpy==2.3.2
+pyparsing==3.2.3
+cadquery==2.5.2
+cadquery-ocp==7.7.2
+networkx==3.5
+unidecode==1.4.0
+h5py==3.14.0

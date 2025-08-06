@@ -6,7 +6,7 @@ authors = [
 ]
 description = "Package to automagically convert step-geometries to h5m descriptions for neutronics by OpenMC"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = "==3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -15,15 +15,14 @@ classifiers = [
     "Environment :: Console",
 ]
 dependencies=[
-        'gmsh',
-        'numpy',
-        'pyparsing',
-        'cadquery>=2',
-        'cadquery-ocp>=7',
-        'numpy',
-        'networkx',
-        'unidecode',
-        'h5py',
+        'gmsh==4.14.0',
+        'numpy==2.3.2',
+        'pyparsing==3.2.3',
+        'cadquery==2.5.2',
+        'cadquery-ocp==7.7.2',        
+        'networkx==3.5',
+        'unidecode==1.4.0',
+        'h5py==3.14.0',
 ]
 
 [project.urls]
