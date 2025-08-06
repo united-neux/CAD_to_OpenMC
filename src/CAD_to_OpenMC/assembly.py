@@ -81,6 +81,101 @@ class Entity:
             self.center = solid.Center()
             self.volume = solid.Volume()
 
+    def get_cms_relative_distance(
+        self,
+        center: tuple = (0, 0, 0)):
+        """
+        Calculates the relative distance between the object's center and a given center point.
+        The distance is computed as the Euclidean norm between the object's center coordinates
+        and the provided `center` tuple, normalized by the norm of the `center` itself.
+        """
+            
+        try:
+            relative_distance = np.linalg.norm(
+                [
+                    self.center.x - center[0],
+                    self.center.y - center[1],
+                    self.center.z - center[2],
+                ]
+            ) / np.linalg.norm(center)
+        except ZeroDivisionError:
+            relative_distance = float('inf')
+        return relative_distance
+        
+
+    def get_bounding_box_relative_distance(
+        self,
+        bb: tuple = (0, 0, 0)):
+            
+        """
+        Calculates the relative distance between the bounding box of the current object and a given bounding box.
+        The distance is computed as the Euclidean norm of the difference between the dimensions of the current object's bounding box (`self.bb`) and the provided bounding box (`bb`), normalized by the norm of the provided bounding box dimensions.
+        """
+        try:
+            relative_distance = np.linalg.norm(
+                [self.bb.xlen - bb[0], self.bb.ylen - bb[1], self.bb.zlen - bb[2]]
+            ) / np.linalg.norm(bb)
+        except ZeroDivisionError:
+            relative_distance = float('inf')
+        return relative_distance
+
+    def get_volume_relative_distance(self,
+        volume: float = 1):
+        """
+        Calculate the relative distance between the object's volume and a given volume.
+        Parameters:
+            volume (float, optional): The reference volume to compare against. Defaults to 1.
+        Returns:
+            float: The absolute relative difference between the object's volume and the given volume.
+        """
+        
+        return np.abs(self.volume - volume) / volume
+
+    def get_similarity_score(
+        self,
+        center: tuple = (0, 0, 0),
+        bb: tuple = (0, 0, 0),
+        volume: float = 1,
+        tolerance=1e-2,)->float:       
+        """
+        Calculates a similarity score based on the relative distances of the center of mass, bounding box, and volume 
+        compared to provided reference values.
+        Args:
+            center (tuple, optional): Reference center of mass coordinates. Defaults to (0, 0, 0).
+            bb (tuple, optional): Reference bounding box dimensions or coordinates. Defaults to (0, 0, 0).
+            volume (float, optional): Reference volume. Defaults to 1.
+            tolerance (float, optional): Tolerance value for similarity calculations. Defaults to 1e-2.
+        Returns:
+            float: The sum of the relative distances for center of mass, bounding box, and volume as a similarity score.
+        """
+        cms_rel_dist = self.get_cms_relative_distance(center = center)
+        bb_rel_dist = self.get_bounding_box_relative_distance(bb = bb)
+        vol_rel_dist = self.get_volume_relative_distance(volume = volume)
+        return cms_rel_dist + bb_rel_dist + vol_rel_dist
+
+    def object_is_similar(self, center: tuple = (0, 0, 0), bb: tuple = (0, 0, 0), volume: float = 1, tolerance=1e-2) -> bool:
+
+        """
+        Determines if the current object is similar to another based on center of mass, bounding box, and volume.
+
+        Args:
+            center (tuple, optional): The reference center of mass coordinates (x, y, z). Defaults to (0, 0, 0).
+            bb (tuple, optional): The reference bounding box dimensions. Defaults to (0, 0, 0).
+            volume (float, optional): The reference volume. Defaults to 1.
+            tolerance (float, optional): The maximum allowed relative difference for similarity. Defaults to 1e-2.
+
+        Returns:
+            bool: True if the center of mass, bounding box, and volume are all within the specified tolerance; False otherwise.
+        """
+        cms_close = (
+            self.get_cms_relative_distance(center = center) < tolerance
+        )
+        bb_close = (
+            self.get_bounding_box_relative_distance(bb = bb) < tolerance
+        )
+        vol_close = self.get_volume_relative_distance(volume = volume) < tolerance
+        return cms_close and bb_close and vol_close
+
     def similarity(
         self,
         center: tuple = (0, 0, 0),
@@ -88,28 +183,6 @@ class Entity:
         volume: float = 1,
         tolerance=1e-2,
     ) -> float:
-        """
-        Quantifies similarity between an Entity and a set of parameters
-
-        Method returns a value for the similarity between the entity and the 3 parameters
-        cms, bb, and volume - presumable cvoming from another Entity
-
-        Parameters
-        ----------
-        center :
-            The center coordinate to compare with
-        bb :
-            Bounding box to compare with
-        volume :
-            Volume to compare with
-        tolerance :
-            Unused - will be removed
-
-        Returns
-        -------
-        float
-            How similar to the another with the given parameters?
-        """
         cms_rel_dist = np.linalg.norm(
             [
                 self.center.x - center[0],
