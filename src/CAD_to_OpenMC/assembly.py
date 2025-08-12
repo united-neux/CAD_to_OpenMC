@@ -176,76 +176,6 @@ class Entity:
         vol_close = self.get_volume_relative_distance(volume = volume) < tolerance
         return cms_close and bb_close and vol_close
 
-    def similarity(
-        self,
-        center: tuple = (0, 0, 0),
-        bb: tuple = (0, 0, 0),
-        volume: float = 1,
-        tolerance=1e-2,
-    ) -> float:
-        cms_rel_dist = np.linalg.norm(
-            [
-                self.center.x - center[0],
-                self.center.y - center[1],
-                self.center.z - center[2],
-            ]
-        ) / np.linalg.norm(center)
-        bb_rel_dist = np.linalg.norm(
-            [self.bb.xlen - bb[0], self.bb.ylen - bb[1], self.bb.zlen - bb[2]]
-        ) / np.linalg.norm(bb)
-        vol_rel_dist = np.abs(self.volume - volume) / volume
-        return cms_rel_dist + bb_rel_dist + vol_rel_dist
-
-    def similar(
-        self,
-        center: tuple = (0, 0, 0),
-        bb: tuple = (0, 0, 0),
-        volume: float = 1,
-        tolerance=1e-2,
-    ) -> bool:
-        """
-        Quantifies similarity between an Entity and a set of parameters
-
-        Method compares an entity and the 3 parameters
-        cms, bb, and volume - presumable cvoming from another Entity, and reports
-        whether it is similar.
-
-        Parameters
-        ----------
-        center :
-            The center coordinate to compare with
-        bb :
-            Bounding box to compare with
-        volume :
-            Volume to compare with
-        tolerance :
-            Threshold for when an object is considered similar.
-
-        Returns
-        -------
-        bool
-            Is this Entity similar to the another with the given parameters?
-        """
-        cms_close = (
-            np.linalg.norm(
-                [
-                    self.center.x - center[0],
-                    self.center.y - center[1],
-                    self.center.z - center[2],
-                ]
-            )
-            / np.linalg.norm(center)
-            < tolerance
-        )
-        bb_close = (
-            np.linalg.norm(
-                [self.bb.xlen - bb[0], self.bb.ylen - bb[1], self.bb.zlen - bb[2]]
-            )
-            / np.linalg.norm(bb)
-            < tolerance
-        )
-        vol_close = np.abs(self.volume - volume) / volume < tolerance
-        return cms_close and bb_close and vol_close
 
     def export_stp(self):
         """
@@ -277,7 +207,7 @@ def idx_similar(entity_list, center, bounding_box, volume):
     """
     idx_found = []
     for i, ent in enumerate(entity_list):
-        if ent.similar(
+        if ent.object_is_similar(
             [center.x, center.y, center.z],
             [bounding_box.xlen, bounding_box.ylen, bounding_box.zlen],
             volume,
@@ -288,7 +218,7 @@ def idx_similar(entity_list, center, bounding_box, volume):
         # we have multiple matches - pick the best one
         dsmall = 1e9
         for i, ent in enumerate([entity_list[idx] for idx in idx_found]):
-            d = ent.similarity(
+            d = ent.get_similarity_score(
                 [center.x, center.y, center.z],
                 [bounding_box.xlen, bounding_box.ylen, bounding_box.zlen],
                 volume,
