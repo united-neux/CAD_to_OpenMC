@@ -126,7 +126,7 @@ class MesherGMSH(assemblymesher):
       closest=1e12
       iclose=-1
       for i,e in enumerate(self.gmsh_mesher_entities):
-          simi=e.similarity(cms,bb,vol,tolerance=1e5)
+          simi=e.get_similarity_score(cms,bb,vol,tolerance=1e5)
           if (simi<closest):
               iclose=i
               closest=simi
