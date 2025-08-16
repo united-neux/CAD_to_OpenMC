@@ -518,7 +518,7 @@ class Assembly:
             self.entities.extend(ents)
         if tags_set != len(self.entities):
             print(
-                f"WARNING: {len(self.entities)-tags_set} volumes were tagged with the default ({default_tag}) material."
+                f"WARNING: {len(self.entities) - tags_set} volumes were tagged with the default ({default_tag}) material."
             )
         # Iterate over the ents array and get all unique tags
         unique_tags = set(e.tag for e in self.entities if e.tag != default_tag)
@@ -539,7 +539,7 @@ class Assembly:
                 ]
                 all_solids_bounding_box = solid_bounding_box_array[0]
                 for bb in solid_bounding_box_array[1:]:
-                    all_solids_bounding_box = all_solids_bounding_box.extend(bb)
+                    all_solids_bounding_box = all_solids_bounding_box.add(bb)
                 bbox = all_solids_bounding_box
                 bbox_text = f"xmin={bbox.xmin}, xmax={bbox.xmax}, ymin={bbox.ymin}, ymax={bbox.ymax}, zmin={bbox.zmin}, zmax={bbox.zmax}"
                 print(f"INFO: Bounding box for tag {tag}: {bbox_text}")
@@ -626,7 +626,7 @@ class Assembly:
                 for v in enumerate(vols):
                     if self.verbose > 1:
                         print(
-                            f"INFO: Applying rotation: {rotate[v[0]+3]} degrees about ax {rotate[v[0]+1]},{rotate[v[0]+2]} to vol(s) {v[1]}\n"
+                            f"INFO: Applying rotation: {rotate[v[0] + 3]} degrees about ax {rotate[v[0] + 1]},{rotate[v[0] + 2]} to vol(s) {v[1]}\n"
                         )
                     for vol in v[1]:
                         transformed_part[vol - 1] = transformed_part[vol - 1].rotate(
@@ -643,15 +643,15 @@ class Assembly:
 
     def print_summary(self):
         # output a summary of the meshing results
-        print(f'SUMMARY: {"solid_id":8} {"material_tag":16} {"stl-file":16}')
+        print(f"SUMMARY: {'solid_id':8} {'material_tag':16} {'stl-file':16}")
         for i, a in zip(range(len(self.entities)), self.entities):
             if not isinstance(a.stl, str):
                 print(
-                    f"SUMMARY: {i+1:8} {a.tag:16} "
+                    f"SUMMARY: {i + 1:8} {a.tag:16} "
                     + " ".join([f"{stl[0]:16}" for stl in a.stl])
                 )
             else:
-                print(f"SUMMARY: {i+1:8} {a.tag:16} {a.stl:16}")
+                print(f"SUMMARY: {i + 1:8} {a.tag:16} {a.stl:16}")
 
     def _datadir_name(self, h5m_filename=""):
         h5mf = pl.Path(h5m_filename)
@@ -1073,7 +1073,7 @@ class Assembly:
                         i_small, d_small = i, d
                 if i_small == -1:
                     print(
-                        f"WARNING: Could not find a matching merged volume for volume {j+1}.",
+                        f"WARNING: Could not find a matching merged volume for volume {j + 1}.",
                         end=" ",
                     )
                     print(
