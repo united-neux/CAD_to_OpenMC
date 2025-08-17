@@ -10,7 +10,7 @@ import re
 import os
 import math
 import sys
-
+from cadquery import BoundBox
 from unidecode import unidecode
 from datetime import datetime
 
@@ -80,6 +80,8 @@ class Entity:
             self.bb = solid.BoundingBox()
             self.center = solid.Center()
             self.volume = solid.Volume()
+            # When availalble, the bounding box in the entire assembly for every part made of this material is stored
+            self.material_bounds_in_assembly: BoundBox | None = None
 
     def get_cms_relative_distance(
         self,
@@ -520,6 +522,32 @@ class Assembly:
             print(
                 f"WARNING: {len(self.entities)-tags_set} volumes were tagged with the default ({default_tag}) material."
             )
+        # Iterate over the ents array and get all unique tags
+        unique_tags = set(e.tag for e in self.entities if e.tag != default_tag)
+        if unique_tags:
+            print(f"INFO: Found unique tags: {unique_tags}")
+        # Iterate over unique tags
+        for tag in unique_tags:
+            print(f"INFO: Processing tag: {tag}")
+            # Get all entities with this tag
+            tagged_entities = [e for e in self.entities if e.tag == tag]
+            print(f"INFO: Found {len(tagged_entities)} entities with tag {tag}")
+            # Get the bounding box for this tag
+            if tagged_entities:
+                # get the solid from the tagged_entities
+
+                solid_bounding_box_array = [
+                    e.solid.BoundingBox() for e in tagged_entities
+                ]
+                all_solids_bounding_box = solid_bounding_box_array[0]
+                for bb in solid_bounding_box_array[1:]:
+                    all_solids_bounding_box = all_solids_bounding_box.add(bb)
+                bbox = all_solids_bounding_box
+                bbox_text = f"xmin={bbox.xmin}, xmax={bbox.xmax}, ymin={bbox.ymin}, ymax={bbox.ymax}, zmin={bbox.zmin}, zmax={bbox.zmax}"
+                print(f"INFO: Bounding box for tag {tag}: {bbox_text}")
+                # Assign this bounding box to the material_bounds_in_assembly attribute
+                for e in tagged_entities:
+                    e.material_bounds_in_assembly = bbox
 
     def load_stp_file(
         self,
