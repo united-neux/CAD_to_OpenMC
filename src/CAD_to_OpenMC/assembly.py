@@ -304,7 +304,7 @@ class H5MTransformer:
         """
         return self.moab_core.get_entity_by_id(entity_id)
 
-    def retag_entity(self, material_tag: str, new_material_tag: str, entity_id: int):
+    def retag_entity(self, new_material_tag: str, entity_id: int):
         """
         Updates the material tag of a specified entity.
         Parameters:
