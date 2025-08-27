@@ -308,7 +308,6 @@ class H5MTransformer:
         """
         Updates the material tag of a specified entity.
         Parameters:
-            material_tag (str): The current material tag assigned to the entity.
             new_material_tag (str): The new material tag to assign to the entity.
             entity_id (int): The unique identifier of the entity to be retagged.
         Returns:
