@@ -257,6 +257,72 @@ def similar_solids(solid1_vol, solid1_bb, solid1_c, solid2_vol, solid2_bb, solid
     )
     return dV + dBB + dCntr
 
+
+class H5MTransformer:
+    """
+    H5MTransformer is a class for manipulating H5M files using the pyMOAB/MOAB core library.
+
+    Attributes:
+        existing_h5m_filepath (str): Path to the original H5M file.
+        updated_h5m_filepath (str): Path to the updated H5M file to be written.
+        moab_core: Instance of pyMOAB/MOAB core used for file operations.
+
+    Methods:
+        __init__(h5m_filename: str):
+            Initializes the transformer with the specified H5M file path.
+
+        read_h5m_file_data() -> None:
+            Loads the H5M file into the MOAB core.
+
+        get_entity_by_id(entity_id: int):
+            Retrieves an entity from the H5M file by its unique ID.
+
+        retag_entity(material_tag: str, new_material_tag: str, entity_id: int):
+
+        write_updated_h5m_file() -> None:
+            Writes the updated H5M file to disk.
+
+    """
+    def __init__(self, h5m_filename: str):
+        self.existing_h5m_filepath = h5m_filename  # Path to the H5M file
+        self.updated_h5m_filepath = h5m_filename.replace(".h5m", "_updated.h5m")
+        self.moab_core = core.Core  # Instance of pyMOAB / MOAB to perform operations
+
+    def read_h5m_file_data(self) -> None:
+        """
+        This method reads the H5M file specified by h5m_filepath.
+        """
+        self.moab_core.load_file(self.existing_h5m_filepath)
+
+    def get_entity_by_id(self, entity_id: int):
+        """
+        This method retrieves an entity from the H5M file by its ID.
+        Args:
+            entity_id (int): The ID of the entity to retrieve.
+        Returns:
+            The entity object if found, None otherwise.
+        """
+        return self.moab_core.get_entity_by_id(entity_id)
+
+    def retag_entity(self, material_tag: str, new_material_tag: str, entity_id: int):
+        """
+        Updates the material tag of a specified entity.
+        Parameters:
+            material_tag (str): The current material tag assigned to the entity.
+            new_material_tag (str): The new material tag to assign to the entity.
+            entity_id (int): The unique identifier of the entity to be retagged.
+        Returns:
+            None
+        """
+        pass
+
+    def write_updated_h5m_file(self) -> None:
+        """
+        This method writes the updated H5M file to disk.
+        """
+        self.moab_core.write_file(self.updated_h5m_filepath)
+
+
 class Assembly:
     """
     Main class representing a geometry model to process
