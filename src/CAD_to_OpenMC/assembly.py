@@ -334,7 +334,7 @@ class H5MTransformer:
 
         return entity_ids
 
-    def get_all_materials_in_file(self) -> list[str]:
+    def get_all_materials(self) -> list[str]:
         """
         This method retrieves all unique material tags from the H5M file.
         Returns:
