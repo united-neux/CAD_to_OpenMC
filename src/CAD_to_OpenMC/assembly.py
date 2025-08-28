@@ -284,9 +284,10 @@ class H5MTransformer:
 
     """
     def __init__(self, h5m_filename: str):
-        self.existing_h5m_filepath = h5m_filename  # Path to the H5M file
+        self.existing_h5m_filename = h5m_filename  # Path to the H5M file
+        self.existing_h5m_filepath = os.path.join(os.getcwd(), h5m_filename)
         self.updated_h5m_filepath = h5m_filename.replace(".h5m", "_updated.h5m")
-        self.moab_core = core.Core  # Instance of pyMOAB / MOAB to perform operations
+        self.moab_core = core.Core()  # Instance of pyMOAB / MOAB to perform operations
 
     def read_h5m_file_data(self) -> None:
         """
@@ -321,6 +322,75 @@ class H5MTransformer:
         """
         self.moab_core.write_file(self.updated_h5m_filepath)
 
+    def get_all_entity_ids(self) -> list[np.uint64]:
+        """
+        This method retrieves all entity IDs from the H5M file.
+        Returns:
+            List of entity IDs.
+        """
+        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set        
+        entity_ids = list(all_entities)
+        print(f"INFO: Found {len(entity_ids)} entities in the H5M file.")
+
+        return entity_ids
+
+    def get_all_materials_in_file(self) -> list[str]:
+        """
+        This method retrieves all unique material tags from the H5M file.
+        Returns:
+            List of unique material tags.
+        """
+        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set
+        material_tags = set()
+        for entity in all_entities:
+            tag_handles = self.moab_core.tag_get_tags_on_entity(entity)
+            print(f"DEBUG: Entity {entity} has tags {[tag.get_name() for tag in tag_handles]}")
+            
+            tag_data = {}
+            for tag_handle in tag_handles:
+                tag_name = tag_handle.get_name()
+                if not tag_name:
+                    print(f"WARNING: tag_handle does not have get_name() method: {tag_handle}")
+                    continue
+
+                if tag_name == types.NAME_TAG_NAME:
+                    tag_data = self.moab_core.tag_get_data(tag_handle, [entity])
+                    
+                    nested_tag_list = tag_data.tolist()
+                    # normalize the list of lists
+                    normalized_tag_list = [tag.strip() for sublist in nested_tag_list for tag in sublist if tag.strip()]
+
+                    for tag in normalized_tag_list:
+                        material_tags.add(tag) 
+
+        print(f"INFO: Found {len(material_tags)} unique materials in the H5M file.")
+        print(f"INFO: Unique materials are: {material_tags}")
+        return list(material_tags)
+    
+    def get_all_entities_of_material(self, material_tag: str) -> list[int]:
+        """
+        Retrieves all entity IDs associated with a given material tag.
+        Parameters:
+            material_tag (str): The material tag to search for.
+        Returns:
+            List of entity IDs associated with the material.
+        """
+        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set
+        matching_entity_ids = []
+        for entity in all_entities:
+            tag_handles = self.moab_core.tag_get_tags_on_entity(entity)
+            for tag_handle in tag_handles:
+                tag_name = tag_handle.get_name()
+                if tag_name == types.NAME_TAG_NAME:
+                    tag_data = self.moab_core.tag_get_data(tag_handle, [entity])
+                    nested_tag_list = tag_data.tolist()
+                    normalized_tag_list = [tag.strip() for sublist in nested_tag_list for tag in sublist if tag.strip()]
+                    if material_tag in normalized_tag_list:
+                        matching_entity_ids.append(entity)
+                        break
+
+        print(f"INFO: Found {len(matching_entity_ids)} entities for material '{material_tag}'.")
+        return matching_entity_ids
 
 class Assembly:
     """
