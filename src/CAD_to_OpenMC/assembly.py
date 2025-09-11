@@ -295,7 +295,7 @@ class H5MTransformer:
         """
         self.moab_core.load_file(self.existing_h5m_filepath)
 
-    def get_entity_by_id(self, entity_id: int) -> np.uint64 | None:
+    def get_entity_by_id(self, entity_id: int) -> Union[np.uint64 , None]:
         """
         This method retrieves an entity from the H5M file by its ID.
         Args:
