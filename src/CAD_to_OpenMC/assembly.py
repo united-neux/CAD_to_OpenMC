@@ -262,6 +262,10 @@ class H5MTransformer:
     """
     H5MTransformer is a class for manipulating H5M files using the pyMOAB/MOAB core library.
 
+    Parameters:
+    verbose : int
+        verbosity level of output. 0: most quiet, 1: some output, 2+: a lot of diagnostic output
+
     Attributes:
         existing_h5m_filepath (str): Path to the original H5M file.
         updated_h5m_filepath (str): Path to the updated H5M file to be written.
@@ -283,7 +287,9 @@ class H5MTransformer:
             Writes the updated H5M file to disk.
 
     """
-    def __init__(self, h5m_filename: str):
+
+    def __init__(self, h5m_filename: str, verbose: int = 1):
+        self.verbose = verbose
         self.existing_h5m_filename = h5m_filename  # Path to the H5M file
         self.existing_h5m_filepath = os.path.join(os.getcwd(), h5m_filename)
         self.updated_h5m_filepath = h5m_filename.replace(".h5m", "_updated.h5m")
@@ -328,9 +334,10 @@ class H5MTransformer:
         Returns:
             List of entity IDs.
         """
-        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set        
+        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set
         entity_ids = list(all_entities)
-        print(f"INFO: Found {len(entity_ids)} entities in the H5M file.")
+        if self.verbose > 0:
+            print(f"INFO: Found {len(entity_ids)} entities in the H5M file.")
 
         return entity_ids
 
@@ -344,29 +351,40 @@ class H5MTransformer:
         material_tags = set()
         for entity in all_entities:
             tag_handles = self.moab_core.tag_get_tags_on_entity(entity)
-            print(f"DEBUG: Entity {entity} has tags {[tag.get_name() for tag in tag_handles]}")
-            
+            if self.verbose >= 2:
+                print(
+                    f"DEBUG: Entity {entity} has tags {[tag.get_name() for tag in tag_handles]}"
+                )
+
             tag_data = {}
             for tag_handle in tag_handles:
                 tag_name = tag_handle.get_name()
                 if not tag_name:
-                    print(f"WARNING: tag_handle does not have get_name() method: {tag_handle}")
+                    print(
+                        f"WARNING: tag_handle does not have get_name() method: {tag_handle}"
+                    )
                     continue
 
                 if tag_name == types.NAME_TAG_NAME:
                     tag_data = self.moab_core.tag_get_data(tag_handle, [entity])
-                    
+
                     nested_tag_list = tag_data.tolist()
                     # normalize the list of lists
-                    normalized_tag_list = [tag.strip() for sublist in nested_tag_list for tag in sublist if tag.strip()]
+                    normalized_tag_list = [
+                        tag.strip()
+                        for sublist in nested_tag_list
+                        for tag in sublist
+                        if tag.strip()
+                    ]
 
                     for tag in normalized_tag_list:
-                        material_tags.add(tag) 
-
-        print(f"INFO: Found {len(material_tags)} unique materials in the H5M file.")
-        print(f"INFO: Unique materials are: {material_tags}")
+                        material_tags.add(tag)
+        if self.verbose > 0:
+            print(f"INFO: Found {len(material_tags)} unique materials in the H5M file.")
+        if self.verbose >= 2:
+            print(f"INFO: Unique materials are: {material_tags}")
         return list(material_tags)
-    
+
     def get_all_entities_of_material(self, material_tag: str) -> list[int]:
         """
         Retrieves all entity IDs associated with a given material tag.
@@ -384,12 +402,19 @@ class H5MTransformer:
                 if tag_name == types.NAME_TAG_NAME:
                     tag_data = self.moab_core.tag_get_data(tag_handle, [entity])
                     nested_tag_list = tag_data.tolist()
-                    normalized_tag_list = [tag.strip() for sublist in nested_tag_list for tag in sublist if tag.strip()]
+                    normalized_tag_list = [
+                        tag.strip()
+                        for sublist in nested_tag_list
+                        for tag in sublist
+                        if tag.strip()
+                    ]
                     if material_tag in normalized_tag_list:
                         matching_entity_ids.append(entity)
                         break
-
-        print(f"INFO: Found {len(matching_entity_ids)} entities for material '{material_tag}'.")
+        if self.verbose > 0:
+            print(
+                f"INFO: Found {len(matching_entity_ids)} entities for material '{material_tag}'."
+            )
         return matching_entity_ids
 
 class Assembly:
