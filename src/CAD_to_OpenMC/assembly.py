@@ -382,7 +382,7 @@ class H5MTransformer:
         if self.verbose > 0:
             print(f"INFO: Found {len(material_tags)} unique materials in the H5M file.")
         if self.verbose >= 2:
-            print(f"INFO: Unique materials are: {material_tags}")
+            print(f"DEBUG: Unique materials are: {material_tags}")
         return list(material_tags)
 
     def get_all_entities_of_material(self, material_tag: str) -> list[int]:
