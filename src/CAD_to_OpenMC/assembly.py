@@ -301,7 +301,7 @@ class H5MTransformer:
         """
         self.moab_core.load_file(self.existing_h5m_filepath)
 
-    def get_entity_by_id(self, entity_id: int):
+    def get_entity_by_id(self, entity_id: int) -> Union[np.uint64 , None]:
         """
         This method retrieves an entity from the H5M file by its ID.
         Args:
@@ -309,7 +309,12 @@ class H5MTransformer:
         Returns:
             The entity object if found, None otherwise.
         """
-        return self.moab_core.get_entity_by_id(entity_id)
+        all_entities = self.moab_core.get_entities_by_handle(0)  # 0 is the root set
+        for entity in all_entities:
+            if entity == entity_id:
+                print(type(entity))
+                return entity
+        return None
 
     def retag_entity(self, new_material_tag: str, entity_id: int):
         """
@@ -320,7 +325,19 @@ class H5MTransformer:
         Returns:
             None
         """
-        pass
+        entity = self.get_entity_by_id(entity_id)
+        if entity is None:
+            print(f"ERROR: Entity with ID {entity_id} not found.")
+            return
+        tag_handles = self.moab_core.tag_get_tags_on_entity(entity)
+        for tag_handle in tag_handles:
+            tag_name = tag_handle.get_name()
+            if tag_name == types.NAME_TAG_NAME:
+                # Update the material tag
+                self.moab_core.tag_set_data(tag_handle, [entity], [[new_material_tag]])
+                print(f"INFO: Updated entity {entity_id} with new material tag '{new_material_tag}'")
+                return
+        print(f"WARNING: Material tag not found on entity {entity_id}. No changes made.")
 
     def write_updated_h5m_file(self) -> None:
         """
