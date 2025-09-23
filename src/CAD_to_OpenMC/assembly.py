@@ -335,9 +335,11 @@ class H5MTransformer:
             if tag_name == types.NAME_TAG_NAME:
                 # Update the material tag
                 self.moab_core.tag_set_data(tag_handle, [entity], [[new_material_tag]])
-                print(f"INFO: Updated entity {entity_id} with new material tag '{new_material_tag}'")
+                if self.verbose > 1:
+                    print(f"INFO: Updated entity {entity_id} with new material tag '{new_material_tag}'")
                 return
-        print(f"WARNING: Material tag not found on entity {entity_id}. No changes made.")
+        if self.verbose > 0:
+            print(f"WARNING: Material tag not found on entity {entity_id}. No changes made.")
 
     def write_updated_h5m_file(self) -> None:
         """
