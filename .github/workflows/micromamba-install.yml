@@ -28,7 +28,7 @@ jobs:
           - pyv: 3.13
           - omcv: 0.13.3
             pyv: 3.9
-          - omcv: 0.15.0
+          - omcv: 0.15.*
             pyv: 3.9
 
     steps:
