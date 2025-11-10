@@ -22,14 +22,14 @@ jobs:
       fail-fast: false
       matrix:
         pyv: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        omcv: ["0.14.0", "0.15.0", "0.15.1", "0.15.2"]
+        omcv: ["0.14.0", "0.15.0", "0.15.2"]
         mpi: ["nompi", "mpi_mpich", "mpi_openmpi"]
         exclude:
           - pyv: 3.13
-          - omcv: 0.13.3
-            pyv: 3.9
-          - omcv: 0.15.*
-            pyv: 3.9
+          - pyv: 3.9
+        include:
+          - pyv: 3.9
+            omcv: [ 0.13.3 0.14.0 ]
 
     steps:
     - uses: actions/checkout@v5
