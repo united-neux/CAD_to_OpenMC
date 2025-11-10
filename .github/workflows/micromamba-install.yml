@@ -27,9 +27,13 @@ jobs:
         exclude:
           - pyv: 3.13
           - pyv: 3.9
+          - pyv: 3.10
+            omcv: 0.15.2
         include:
           - pyv: 3.9
-            omcv: [ 0.13.3 0.14.0 ]
+            omcv: 0.13.3
+          - pyv: 3.9
+            omcv: 0.14.0
 
     steps:
     - uses: actions/checkout@v5
