@@ -31,8 +31,6 @@ jobs:
             omcv: 0.15.2
         include:
           - pyv: 3.9
-            omcv: 0.13.3
-          - pyv: 3.9
             omcv: 0.14.0
 
     steps:
