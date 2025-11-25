@@ -36,7 +36,7 @@ jobs:
             omcv: 0.14.0
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{matrix.pyv}}
       uses: actions/setup-python@v6
       with:
