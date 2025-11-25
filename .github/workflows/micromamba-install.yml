@@ -29,6 +29,8 @@ jobs:
           - pyv: 3.9
           - pyv: 3.10
             omcv: 0.15.2
+          - omvc: 0.13.3
+            pyv: 3.10
         include:
           - pyv: 3.9
             omcv: 0.14.0
