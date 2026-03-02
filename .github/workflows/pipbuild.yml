@@ -26,7 +26,7 @@ jobs:
         python -m pip install --user --upgrade build
         python -m build
     - name: Archive package
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: CAD_to_OpenMC
         path: dist
